@@ -1,95 +1,95 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: 在完成任务、实现重大特性或合并之前使用，以核实工作是否符合需求
 ---
 
-# Requesting Code Review
+# 请求代码评审（Requesting Code Review）
 
-Dispatch a code reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history.
+派发一个代码评审子代理，让问题在级联扩散之前就被抓住。评审者拿到的是为评估而精心构造的上下文——绝不是你的会话历史。
 
-**Core principle:** Review early, review often.
+**核心原则：** 尽早评审，经常评审。
 
-## When to Request Review
+## 何时请求评审（When to Request Review）
 
-**Mandatory:**
-- After each task in subagent-driven development
-- After completing major feature
-- Before merge to main
+**必须（Mandatory）：**
+- 在 subagent-driven development 中完成每个任务之后
+- 完成重大特性之后
+- 合并到主分支之前
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+**可选但有价值（Optional but valuable）：**
+- 卡住的时候（换个新鲜视角）
+- 重构之前（基线检查）
+- 修复复杂 bug 之后
 
-## How to Request
+## 如何请求（How to Request）
 
-**1. Get git SHAs:**
+**1. 获取 git SHA：**
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-**2. Dispatch code reviewer subagent:**
+**2. 派发代码评审子代理：**
 
-Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
+派发一个 `general-purpose` 子代理，填入 [code-reviewer.md](code-reviewer.md) 中的模板。
 
-**Placeholders:**
-- `{DESCRIPTION}` - Brief summary of what you built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
+**占位符：**
+- `{DESCRIPTION}` - 简要说明你构建了什么
+- `{PLAN_OR_REQUIREMENTS}` - 它应当做什么
+- `{BASE_SHA}` - 起始提交
+- `{HEAD_SHA}` - 结束提交
 
-**3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+**3. 根据反馈行动：**
+- 立即修复严重（Critical）问题
+- 在继续之前修复重要（Important）问题
+- 把次要（Minor）问题记下来稍后处理
+- 如果评审者错了就反驳（附上理由）
 
-## Example
+## 示例（Example）
 
 ```
-[Just completed Task 2: Add verification function]
+[刚完成 Task 2：添加验证函数]
 
-You: Let me request code review before proceeding.
+你：在继续之前，我先请求一次代码评审。
 
 BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | awk '{print $1}')
 HEAD_SHA=$(git rev-parse HEAD)
 
-[Dispatch code reviewer subagent]
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md
+[派发代码评审子代理]
+  DESCRIPTION: 添加了 verifyIndex() 和 repairIndex()，覆盖 4 种问题类型
+  PLAN_OR_REQUIREMENTS: docs/superpowers/plans/deployment-plan.md 中的 Task 2
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
-[Subagent returns]:
-  Strengths: Clean architecture, real tests
+[子代理返回]：
+  Strengths: 架构干净，测试真实
   Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
+    Important: 缺少进度指示器
+    Minor: 报告间隔的魔法数字（100）
+  Assessment: 可以继续
 
-You: [Fix progress indicators]
-[Continue to Task 3]
+你：[修复进度指示器]
+[继续到 Task 3]
 ```
 
-## Common Rationalizations
+## 常见的自我合理化（Common Rationalizations）
 
-| Excuse | Reality |
+| 借口（Excuse） | 现实（Reality） |
 |--------|---------|
-| "I'll just review the diff myself instead of dispatching a reviewer" | You're the coordinator — reviewing the diff inline burns the context window you need to keep driving the work. Dispatch a reviewer subagent: the diff and the evaluation live in its context, and only the findings come back to you. |
-| "The reviewer needs my whole session history to understand the change" | Hand it precisely crafted context, never your session's history. That keeps the reviewer on the work product, not your thought process. |
+| "我自己内联看一下 diff 就行了，不用派评审者" | 你是协调者——内联看 diff 会烧掉你需要用来继续推进工作的上下文窗口。派一个评审子代理：diff 和评估都在它的上下文里，只有结论回到你这里。 |
+| "评审者需要我的整个会话历史才能理解这次改动" | 交给它精心构造的上下文，绝不是你的会话历史。这样能让评审者专注于工作成果，而不是你的思考过程。 |
 
-## Red Flags
+## 危险信号（Red Flags）
 
-**Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
+**绝不（Never）：**
+- 因为"很简单"就跳过评审
+- 无视严重（Critical）问题
+- 带着未修复的重要（Important）问题继续
+- 跟合理的技术反馈抬杠
 
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
+**如果评审者错了：**
+- 用技术理由反驳
+- 用代码 / 测试证明它能工作
+- 请求澄清
 
-See template at: [code-reviewer.md](code-reviewer.md)
+模板见：[code-reviewer.md](code-reviewer.md)

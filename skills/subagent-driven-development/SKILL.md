@@ -1,36 +1,25 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: 当在当前会话中执行包含相互独立任务的实施计划时使用
 ---
 
-# Subagent-Driven Development
+# 子代理驱动开发（Subagent-Driven Development）
 
-Execute plan by dispatching a fresh implementer subagent per task, a task review (spec compliance + code quality) after each, and a broad whole-branch review at the end.
+执行计划的方式是：每个任务派发一个全新的实现子代理，每个任务之后做一次任务审查（规格符合性 + 代码质量），最后对整条分支做一次宽泛的整体审查。
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+**为什么用子代理：** 你把任务委派给拥有隔离上下文的专用子代理。通过精心构造它们的指令与上下文，你确保它们保持专注并成功完成任务。它们绝不应继承你当前会话的上下文或历史——你为它们构造恰好所需的内容。这也能为你自己保留用于协调工作的上下文。
 
-**Core principle:** Fresh subagent per task + task review (spec + quality) + broad final review = high quality, fast iteration
+**核心原则：** 每个任务一个全新子代理 + 任务审查（规格 + 质量）+ 最终宽泛审查 = 高质量、快速迭代
 
-**Narration:** between tool calls, narrate at most one short line — the
-ledger and the tool results carry the record.
+**旁白（Narration）：** 在两次工具调用之间，最多旁白一行短话——台账（ledger）和工具结果自会承载记录。
 
-**Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are the four named below, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+**持续执行：** 不要在任务之间停下来向你的（人类）搭档确认。一口气执行完计划里的所有任务。唯一能让你停下来的理由，是下面点名的四类情况，或所有任务都已完成。"我该继续吗？"式的追问和进度汇报浪费他们的时间——他们让你执行计划，那就执行。
 
-**Rulings, not stalls.** A running plan does not wait on a human. Conflicts,
-ambiguities, plan defects, a cap you would have asked to exceed — decide
-them. The spec is the binding authority, the plan is its argument, and your
-judgment settles what neither answers. Record every decision in the ledger as
-`Ruling: <what you decided> — <why> — <what it costs if wrong>`, and keep
-going. A wrong ruling costs rework your human partner can see and undo; a
-session parked on a question costs their whole day and buys nothing.
+**裁决，而不是卡壳（Rulings, not stalls）。** 一份进行中的计划不会等人。冲突、歧义、计划缺陷、你本想请求突破的上限——都由你来裁决。规格说明是约束性权威，计划是它的论证，而两者都没回答的问题由你的判断来定夺。把每个决定记入台账，格式为 `Ruling: <你决定什么> — <为什么> — <如果错了代价是什么>`，然后继续前进。一次错误的裁决代价是返工，你的搭档看得见、也能撤销；而一个停在问题上的会话会浪费他们一整天，什么也换不来。
 
-Four things stop you, and only these: an irreversible or destructive
-operation; a security-sensitive action; a side effect outside this worktree
-that norms say you ask about first (a merge, a push to a shared branch, a
-publish); and a plan so broken that every path forward is a guess. For those,
-stop and ask.
+能让你停下来的只有四类事：不可逆或破坏性操作；涉及安全的动作；本 worktree 之外、按惯例应先征询的副作用（一次合并、推送到共享分支、一次发布）；以及一份破到"任何前进方向都只能靠猜"的计划。遇到这些，停下来问。
 
-## When to Use
+## 何时使用
 
 ```dot
 digraph when_to_use {
@@ -50,13 +39,13 @@ digraph when_to_use {
 }
 ```
 
-**vs. Executing Plans (parallel session):**
-- Same session (no context switch)
-- Fresh subagent per task (no context pollution)
-- Review after each task (spec compliance + code quality), broad review at the end
-- Faster iteration (no human-in-loop between tasks)
+**对比 执行计划（Executing Plans，并行会话）：**
+- 同一会话（无上下文切换）
+- 每个任务全新子代理（无上下文污染）
+- 每个任务之后审查（规格符合性 + 代码质量），结束时宽泛审查
+- 迭代更快（任务之间无人工介入）
 
-## The Process
+## 流程（The Process）
 
 ```dot
 digraph process {
@@ -121,448 +110,239 @@ digraph process {
 }
 ```
 
-## Setup
+## 准备工作（Setup）
 
-Ensure the work happens in an isolated workspace: use
-superpowers:using-git-worktrees to create one or verify the existing one.
-Never start implementation on a main/master branch without your human
-partner's explicit consent.
+确保工作在隔离的工作区中发生：使用 superpowers:using-git-worktrees 创建一个，或核实已存在的那一个。未经你的（人类）搭档明确同意，绝不要在 main/master 分支上开始实施。
 
-Conversation memory does not survive compaction. In real sessions,
-controllers that lost their place have re-dispatched entire completed task
-sequences — the single most expensive failure observed. Track progress in
-a ledger file, not only in todos.
+会话记忆无法在压缩（compaction）后幸存。在真实会话中，丢失了自己位置的控制器曾把整段已完成的任务序列重新派发了一遍——这是观察到的最昂贵的一次失败。请把进度记在台账（ledger）文件里，而不只是写在 todo 里。
 
-- Each plan owns a workspace: at skill start, run this skill's
-  `scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
-  directory (`<repo-root>/.superpowers/sdd/<plan-basename>/`), home to
-  every artifact for THIS plan: ledger, briefs, reports, review packages.
-  Another plan's directory is never yours to read or write.
-- Check for this plan's ledger at `<workspace>/progress.md`. If its first
-  line names your plan file, tasks with a `Task <N>: complete` line are DONE
-  — do not re-dispatch them; resume at the first task without one. A task
-  whose last line is a fix round is mid-loop: resume the loop at the next
-  round. A ledger whose first line names a different plan file — or a stray
-  ledger at the old flat path `.superpowers/sdd/progress.md` — is another
-  plan's progress: leave it in place and start your own, fresh.
-- Create the ledger with its identity as the first line:
-  `# SDD ledger — plan: <plan file path>`.
-- The ledger is your recovery map: the commits it names exist in git even
-  when your context no longer remembers creating them. After compaction,
-  trust the ledger and `git log` over your own recollection.
-- `git clean -fdx` will destroy the workspace (it's git-ignored scratch); if
-  that happens, recover from `git log`.
+- 每份计划独占一个工作区：技能启动时，运行本技能目录下的 `scripts/sdd-workspace PLAN_FILE`——它会打印该计划对应的 git 忽略目录（`<repo-root>/.superpowers/sdd/<plan-basename>/`），那里存放本计划的所有产物：台账、任务简报、报告、审查包。其他计划的目录永远不是你有权读写的地方。
+- 检查本计划的台账是否在 `<workspace>/progress.md`。如果它的第一行指向你的计划文件，那么带 `Task <N>: complete，Task Begin Time <beginTime minutes>， Task End Time <endtime minutes>，Used Time <usedtime minutes>` 行的任务都已完成——不要重新派发它们；从第一个没有该标记的任务继续。最后一行是某轮修复的任务正处于修复循环中：从下一轮恢复循环。第一行指向其他计划文件的台账——或遗留在旧的扁平路径 `.superpowers/sdd/progress.md` 的散落台账——属于其他计划的进度：让它留在原地，你自己从零开始。
+- 以台账的身份标识作为第一行创建台账：`# SDD ledger — plan: <plan file path>`。
+- 台账是你的恢复地图：其中点名的提交在 git 里真实存在，即使你的上下文已不记得创建过它们。压缩之后，相信台账和 `git log`，而不是你自己的记忆。
+- `git clean -fdx` 会摧毁工作区（它是 git 忽略的临时区）；如果发生了，从 `git log` 恢复。
 
-Read the plan once, note its context and Global Constraints, and create a
-todo per task. If the plan names a Spec, read that too: the spec is the
-authority the plan argues from, and conflicts inside the plan resolve
-against it. A plan with no reachable spec gets a ledger note saying so —
-rulings made without one are provisional.
+把计划通读一遍，记下它的上下文和全局约束，并为每个任务创建一个 todo。如果计划指名了一份规格说明（Spec），也把它读了：规格是计划据以论证的权威，计划内部的冲突以它为最终裁决。没有可达规格的计划要在台账里记一笔说明——缺少规格做出的裁决都是暂时性的。
 
-Before dispatching Task 1, scan the plan once for conflicts, writing down
-what you checked as you check it:
+在派发任务 1 之前，先通扫一遍计划找冲突，边查边记下你查了什么：
 
-- tasks that contradict each other or the plan's Global Constraints
-- anything the plan explicitly mandates that the review rubric treats as a
-  defect (a test that asserts nothing, verbatim duplication of a logic block)
+- 相互矛盾、或与计划"全局约束"冲突的任务
+- 计划明确要求、但审查规则视为缺陷的东西（一个不断言任何东西的测试、一段逐字复制的逻辑块）
 
-The scan's output is a table, not a verdict. One row for every pair of tasks
-that share a file or an interface: the two tasks, what one produces against
-what the other consumes, and what you found. One row for every task: whether
-its own text agrees with itself — the tests it specifies against the code it
-specifies, the files it creates against the files it later touches. "The scan
-is clean" without those rows is not a scan you ran.
+扫描的产物是一张表，而不是一份判决。每一个共享同一文件或同一接口的任务对占一行：两个任务各是谁、一方产出的对另一方消费的、你发现了什么。每个任务也占一行：它自身的文本是否自洽——它指定的测试对指定的代码、它创建的文件对它后来触碰的文件。"扫描是干净的"这句话如果没有这些行，就不算你做过扫描。
 
-Write the table to the ledger. Rule on everything you find before execution
-begins — each finding against the plan text that mandates it — and record
-each ruling in the ledger. If the scan is clean, proceed without comment.
-Rule on each conflict it surfaces — the spec is the binding authority, the
-plan is its argument — record the ruling beside its row, and dispatch
-Task 1. The review loop remains the net for conflicts that only emerge from
-implementation.
+把表写进台账。在开始执行之前，对你发现的一切做出裁决——每条发现都对照强制产生它的计划文本——并把每条裁决记入台账。如果扫描是干净的，不解释直接继续。对它暴露出的每个冲突做出裁决——规格是约束性权威，计划是它的论证——把裁决记在对应行的旁边，然后派发任务 1。审查循环仍然是兜住"只有实施才会浮现的冲突"的网。
 
-## Model Selection
+## 模型选择（Model Selection）
 
-Use the least powerful model that can handle each role to conserve cost and increase speed.
+使用能胜任每个角色的、尽量低配的模型，以节约成本、提高速度。
 
-**Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
+**机械性实现任务**（孤立的函数、清晰的规格、1-2 个文件）：用快速且便宜的模型。当计划写得足够好时，大多数实现任务都是机械性的。
 
-**Integration and judgment tasks** (multi-file coordination, pattern matching, debugging): use a standard model.
+**集成与判断类任务**（多文件协调、模式匹配、调试）：用标准模型。
 
-**Architecture and design tasks**: use the most capable available model.
-The final whole-branch review is one of these — dispatch it on the most
-capable available model, not the session default.
+**架构与设计任务**：用当前可用能力最强的模型。最终的全分支审查就属于这一类——派发时要用当前可用能力最强的模型，而不是会话默认模型。
 
-**Review tasks**: choose the model with the same judgment, scaled to the
-diff's size, complexity, and risk. A small mechanical diff does not need the
-most capable model; a subtle concurrency change does. Scoped re-reviews of
-small fix diffs take a cheap-to-mid tier.
+**审查任务**：选择具备同等判断力的模型，按 diff 的大小、复杂度与风险缩放。一个小而机械的 diff 不需要最强模型；一个微妙的并发改动则需要。对小型修复 diff 的限定范围复审（scoped re-review）用便宜到中档的档次即可。
 
-**Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
-the implementer that got stuck.
+**修复循环升级（第 4-5 轮）**：使用至少比卡住的实现者高一档的模型。
 
-**Always specify the model explicitly when dispatching a subagent.** An
-omitted model inherits your session's model — often the most capable and
-most expensive — which silently defeats this section.
+**派发子代理时始终显式指定模型。** 漏掉模型会让它继承你会话的模型——往往是最强也最贵的——这会悄悄毁掉本节的所有意图。
 
-**Turn count beats token price.** Wall-clock and context cost scale with how
-many turns a subagent takes, and the cheapest models routinely take 2-3× the
-turns on multi-step work — costing more overall. Use a mid-tier model as the
-floor for reviewers and for implementers working from prose descriptions.
-When the task's plan text contains the complete code to write, the
-implementation is transcription plus testing: use the cheapest tier for
-that implementer. Single-file mechanical fixes also take the cheapest tier.
+**轮数胜过 token 价格。** 墙上时钟与上下文成本随子代理消耗的轮数增长，而最便宜的模型在多步骤工作上通常要多花 2-3 倍的轮数——总成本反而更高。把中档模型作为审查者、以及从文字描述出发工作的实现者的下限。当任务的计划文本包含要写的完整代码时，实现就是"转写 + 测试"：这种实现者用最便宜的档即可。单文件机械修复也用最便宜的档。
 
-**Task complexity signals (implementation tasks):**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+**任务复杂度信号（实现任务）：**
+- 只动 1-2 个文件且规格完整 → 便宜模型
+- 动多个文件、有集成问题 → 标准模型
+- 需要设计判断或对代码库的广泛理解 → 最强模型
 
-## The Task Loop
+## 任务循环（The Task Loop）
 
-**Batch small same-shape work.** When the plan lists several tasks that are
-each a small, independent edit of the same kind — the same one-line fix,
-constant change, or field addition repeated across files — do not dispatch
-one subagent per task. Compose ONE dispatch brief listing every file and
-its change, send the whole batch to a single subagent, and review its diff
-as one unit. Reserve one-dispatch-per-task for work that needs its own
-judgment, its own tests, or its own review surface.
+**批量处理同形状的小任务。** 当计划列出若干任务、而它们各自都是同一种小而独立的编辑——同一行修复、常量改动、或跨文件重复的字段添加——不要每个任务派发一个子代理。把列出每个文件及其改动的**一份**派发简报合并起来，把整批发给**一个**子代理，并把它的 diff 作为一个整体来审查。只有需要独立判断、独立测试或独立审查面的工作，才保留"一个任务一次派发"。
 
-Everything you paste into a dispatch prompt — and everything a subagent
-prints back — stays resident in your context for the rest of the session
-and is re-read on every later turn. Hand artifacts over as files.
+你贴进派发提示词的每一段内容——以及子代理打印回来的每一段——都会在你上下文里驻留到会话结束，并在之后的每一轮被重新读取。产物用文件来交接。
 
-**Waiting on dispatched subagents:** never poll a wait interface with
-short timeouts, and never sit in one silent, open-ended wait either.
-While you have local work — ledger updates, packaging the next review,
-reading reports — keep working; child results arrive on their own.
-When you are genuinely idle, wait in bounded stretches (five to ten
-minutes, where your platform allows), and between stretches post one
-line of status and reconcile your live children: list them, and chase
-any that finished without reporting. A bounded stretch keeps nearly
-all of a long wait's efficiency while guaranteeing a stuck or lost
-child is noticed within minutes, not at the end of the session.
+**等待已派发的子代理：** 永远不要用很短的超时去轮询等待接口，也不要陷入一次静默的无界等待。当你有本地工作可做时——更新台账、打包下一次审查、阅读报告——继续干活；子代理的结果会自己到达。当你确实空闲时，用有界的时长等待（在你的平台允许下，五到十分钟），每段之间发一行状态，并核对你的在途子代理：列出它们，追查任何已完成却没报告的对象。有界等待能在保留长等待绝大部分效率的同时，保证卡住或丢失的子代理在几分钟内被察觉，而不是等到会话结束。
 
-### 1. Dispatch the implementer
+### 1. 派发实现者
 
-Record BASE (`git rev-parse HEAD`) before dispatching — the review package
-and fix-round diffs need it.
+在派发前记录 BASE（`git rev-parse HEAD`）——审查包和修复轮 diff 都需要它。
 
-- **Task brief:** before dispatching an implementer, run this skill's
-  `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a
-  uniquely named file and prints the path. Compose the dispatch so the
-  brief stays the single source of
-  requirements. Your dispatch should contain: (1) one line on where this
-  task fits in the project; (2) the brief path, introduced as "read this
-  first — it is your requirements, with the exact values to use verbatim";
-  (3) interfaces and decisions from earlier tasks that the brief cannot
-  know; (4) your resolution of any ambiguity you noticed in the brief;
-  (5) the report-file path and report contract. Exact values (numbers,
-  magic strings, signatures, test cases) appear only in the brief. Never
-  make a subagent read the whole plan file.
-- **Report file:** name the implementer's report file after the brief
-  (brief `…/task-N-brief.md` → report `…/task-N-report.md`) and put it in
-  the dispatch prompt. The implementer writes the full report there and
-  returns only status, commits, a one-line test summary, and concerns.
-- A dispatch prompt describes one task, not the session's history. Do not
-  paste accumulated prior-task summaries ("state after Tasks 1-3") into
-  later dispatches — a real session's dispatch hit 42k chars of which 99%
-  was pasted history. A fresh subagent needs its task, the interfaces it
-  touches, and the global constraints. Nothing else.
-- The dispatch carries the no-subagents contract (it is in the
-  implementer template): the implementer never dispatches subagents —
-  not helpers, and never a reviewer. Review arrives from you, after the
-  report. In real sessions, every reviewer a worker spawned duplicated
-  the task review the controller dispatched anyway — a full extra
-  review seat per task.
-- If an earlier task parked a finding in the area this task touches, carry
-  a pointer to that ledger entry in the dispatch.
-- Record the implementer's agent identity from the dispatch result —
-  fix-loop rounds 1-3 resume this agent.
-- Never dispatch multiple implementation subagents in parallel (conflicts).
+- **任务简报（Task brief）：** 派发实现者之前，运行本技能的 `scripts/task-brief PLAN_FILE N`——它把任务全文抽取到唯一命名的文件并打印路径。派发内容要确保简报始终是需求的唯一来源。你的派发应包含：(1) 一行说明该任务在项目中的位置；(2) 简报路径，以"先读这个——它就是你的需求，其中含必须逐字使用的精确取值"引出；(3) 简报无从得知的、来自前序任务的接口与决策；(4) 你注意到的简报歧义的解决方案；(5) 报告文件路径与报告契约。精确取值（数字、魔法字符串、签名、测试用例）只出现在简报里。绝不让子代理通读整个计划文件。
+- **报告文件（Report file）：** 让实现者的报告文件以简报命名（简报 `…/task-N-brief.md` → 报告 `…/task-N-report.md`），并把路径写进派发提示词。实现者把完整报告写进那里，返回时只报状态、提交、一行测试摘要和顾虑。
+- 一份派发提示词描述**一个**任务，而不是会话的历史。不要把积累的前序任务摘要（"任务 1-3 之后的状态"）贴进后续派发——真实会话里曾有一次派发达到 42k 字符、其中 99% 是粘贴的历史。一个全新子代理需要的是：它的任务、它要触碰的接口、全局约束。仅此而已。
+- 派发携带"不派子代理"契约（它在实现者模板里）：实现者绝不派发子代理——不派助手，更不派审查者。审查只能由你、在收到报告之后进行。在真实会话中，工作人员派生的每个审查者都只是重复了控制器本来就会派发的任务审查——每个任务多出一整个审查席位。
+- 如果某个前序任务在你这个任务将要触碰的区域停放了一条发现，在派发里带上那条台账记录的指针。
+- 从派发结果里记录实现者的 agent 身份——修复循环第 1-3 轮要恢复这个 agent。
+- 绝不同时并行派发多个实现子代理（会冲突）。
 
-Template: [implementer-prompt.md](implementer-prompt.md)
+模板：[implementer-prompt.md](implementer-prompt.md)
 
-### 2. Handle the report
+### 2. 处理报告
 
-Implementer subagents report one of four statuses. Handle each appropriately:
+实现者子代理会报告四种状态之一。请分别恰当地处理：
 
-**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE：** 生成审查包（`scripts/review-package PLAN_FILE BASE HEAD`，从本技能目录运行——它会打印写出的唯一文件路径；BASE 是你在派发实现者前记录的提交——绝不要用 `HEAD~1`，它会悄悄丢掉多提交任务除最后一笔外的所有提交），然后用打印出的路径派发任务审查者。
 
-**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
+**DONE_WITH_CONCERNS：** 实现者完成了工作，但标注了疑虑。继续之前先读这些顾虑。如果顾虑涉及正确性或范围，在审查之前先处理它们。如果只是观察（例如"这个文件在变大"），记下来然后继续审查。
 
-**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
+**NEEDS_CONTEXT：** 实现者需要之前没提供的信息。补上缺失的上下文后重新派发。
 
-**BLOCKED:** The implementer cannot complete the task. Assess the blocker:
-1. If it's a context problem, provide more context and re-dispatch with the same model
-2. If the task requires more reasoning, re-dispatch with a more capable model
-3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, rule on the correction, ledger it, and re-dispatch with the ruling carried in the dispatch
+**BLOCKED：** 实现者无法完成任务。评估阻塞原因：
+1. 如果是上下文问题，提供更多上下文，用同一模型重新派发
+2. 如果任务需要更多推理，用更强的模型重新派发
+3. 如果任务太大，把它拆成更小的块
+4. 如果计划本身错了，对修正做出裁决、记入台账，并在派发中带上该裁决重新派发
 
-**Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
+**绝不要**无视一次升级、或强迫同一个模型在毫无改变的情况下重试。如果实现者说它卡住了，就必须有东西要改变。
 
-If the implementer asks questions — before starting or mid-task — answer
-clearly and completely, provide additional context if needed, and don't
-rush it into implementation.
+如果实现者问问题——开工前或中途——清晰完整地回答，必要时补充上下文，并且不要催它进入实现。
 
-### 3. Review the task
+### 3. 审查任务
 
-Per-task reviews are task-scoped gates. The broad review happens once, at the
-final whole-branch review. Never skip the task review, and never accept a
-report missing either verdict — spec compliance AND task quality are both
-required. Implementer self-review never replaces the task review; both are
-needed.
+每任务审查是任务范围的关卡。宽泛审查只做一次，在最终的全分支审查。绝不要跳过任务审查，也绝不要接受缺少任一结论的报告——规格符合性 **和** 任务质量都必需。实现者的自审永远不能替代任务审查；两者都需要。
 
-- Hand the reviewer its diff as a file: run this skill's
-  `scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the file path
-  it prints (or, without bash: `git log --oneline`, `git diff --stat`,
-  and `git diff -U10` for the range, redirected to one uniquely named
-  file). The output never enters your own context, and the reviewer sees
-  the commit list, stat summary, and full diff with context in one Read
-  call. Use the BASE you recorded before dispatching the implementer —
-  never `HEAD~1`, which silently truncates multi-commit tasks. Never
-  dispatch a task reviewer without a diff file.
-- **Reviewer inputs:** the task reviewer gets three paths — the same brief
-  file, the report file, and the review package — plus the global
-  constraints that bind the task.
-- The global-constraints block you hand the reviewer is its attention
-  lens. Copy the binding requirements verbatim from the plan's Global
-  Constraints section or the spec: exact values, exact formats, and the
-  stated relationships between components ("same layout as X", "matches
-  Y"). The reviewer's template already carries the process rules (YAGNI,
-  test hygiene, review method) — the constraints block is for what THIS
-  project's spec demands.
-- Do not add open-ended directives like "check all uses" or "run race tests
-  if useful" without a concrete, task-specific reason
-- Do not ask a reviewer to re-run tests the implementer already ran on the
-  same code — the implementer's report carries the test evidence
-- Do not pre-judge findings for the reviewer — never instruct a reviewer to
-  ignore or not flag a specific issue. If you believe a finding would be a
-  false positive, let the reviewer raise it and adjudicate it in the review
-  loop. If the prompt you are writing contains "do not flag," "don't treat X
-  as a defect," "at most Minor," or "the plan chose" — stop: you are
-  pre-judging, usually to spare yourself a review loop.
-The task reviewer may report "⚠️ Cannot verify from diff" items — requirements
-that live in unchanged code or span tasks. These do not block the rest of the
-review, but you must resolve each one yourself before marking the task
-complete: you hold the plan and cross-task context the reviewer
-lacks. If you confirm an item is a real gap, treat it as a failed spec
-review — it enters the fix loop with the other findings.
+- 把审查者要看的 diff 以文件形式交给它：运行本技能的 `scripts/review-package PLAN_FILE BASE HEAD`，把打印出的文件路径传给审查者（无 bash 时：把 `git log --oneline`、`git diff --stat` 和该范围的 `git diff -U10` 重定向到一个唯一命名的文件）。输出绝不进入你自己的上下文，审查者一次 Read 调用就能看到提交列表、stat 摘要和带上下文的完整 diff。用你派发实现者前记录的 BASE——绝不要 `HEAD~1`，它会悄悄截断多提交任务。绝不要在没有 diff 文件的情况下派发任务审查者。
+- **审查者输入：** 任务审查者拿到三个路径——同一份简报文件、报告文件、审查包——外加约束该任务的全局约束。
+- 你交给审查者的全局约束块就是它的注意力透镜。从计划的"全局约束"小节或规格中逐字复制约束性要求：精确取值、精确格式、以及所述的组件间关系（"与 X 同布局"、"匹配 Y"）。审查者模板已自带流程规则（YAGNI、测试卫生、审查方法）——约束块是用来放**这个**项目的规格所要求的那些东西的。
+- 不要在没有具体、与任务相关的理由时加开放式指令，比如"检查所有用法"或"如果有用就跑一下竞态测试"
+- 不要要求审查者重跑实现者已经在同一份代码上跑过的测试——实现者的报告里带有测试证据
+- 不要替审查者预判发现——绝不要指示审查者忽略或不标记某个具体问题。如果你认为某条发现会是误报，就让审查者提出它，再由你在审查循环里裁决。如果你正在写的提示词里出现了"不要标记"、"别把 X 当缺陷"、"最多 Minor"或"计划选择了"——停下来：你正在预判，通常是为了给自己省一轮审查循环。
+任务审查者可能报告"⚠️ 无法从 diff 验证（Cannot verify from diff）"的项——那些落在未改动代码中、或横跨多个任务的需求。这些不阻塞其余审查，但你必须在标记任务完成前亲自逐条解决：计划与跨任务上下文在你手里，而审查者没有。如果你确认某项是真实缺口，就按失败的规格审查对待——它和其他发现一起进入修复循环。
 
-Template: [task-reviewer-prompt.md](task-reviewer-prompt.md)
+模板：[task-reviewer-prompt.md](task-reviewer-prompt.md)
 
-### 4. The fix loop
+### 4. 修复循环
 
-The loop triggers when the review reports spec ❌, any Critical or Important
-finding, or a ⚠️ item you confirmed as a real gap.
+当审查报告规格 ❌、任何 Critical 或 Important 级别的发现、或一条你确认为真实缺口的 ⚠️ 项时，循环被触发。
 
-Before the loop starts, two routes leave it immediately:
+循环开始前，有两条路可以立刻离开它：
 
-- Record Minor findings in the progress ledger as you go
-  (`Task <N>: minor (deferred): <one-liner>`), and point the final
-  whole-branch review at that list so it can triage which must be fixed
-  before merge. A roll-up nobody reads is a silent discard. Minor findings
-  never enter the loop.
-- A finding labeled plan-mandated — or any finding that conflicts with
-  what the plan's text requires — is yours to rule on: weigh the finding
-  against the plan text, decide with the spec as the binding authority, and
-  ledger the ruling before you act on it. Do not dismiss the finding because
-  the plan mandates it, and do not dispatch a fix that contradicts the plan
-  without a recorded ruling.
-Everything else enters the loop. A fix round is one fix dispatch plus one
-scoped re-review. Five rounds maximum per task:
+- 把 Minor 级别的发现随手记入进度台账（`Task <N>: minor (deferred): <one-liner>`），并把该清单指给最终的全分支审查，让它分诊哪些必须在合并前修掉。一份没人读的汇总就是静默丢弃。Minor 发现绝不进入循环。
+- 一条被标注为"计划强制要求"的发现——或任何与计划文本要求冲突的发现——由你来裁决：把发现与计划文本放到天平上，以规格作为约束性权威做决定，并在行动之前把裁决记入台账。不要因为"计划就是这么写的"就打发掉发现，也不要在没有记录裁决的情况下派发与计划相抵触的修复。
 
-**Rounds 1-3 — resume the original implementer.** Send it the open findings
-verbatim. Its context is intact: it knows the task, the code, and its own
-choices. If your harness cannot send another message to a live subagent,
-dispatch a fresh implementer carrying the brief path, the report-file path,
-and the findings — the report file is the persistent memory either way.
+其余一切进入循环。一轮修复 = 一次修复派发 + 一次限定范围复审。每个任务最多五轮：
 
-**Rounds 4-5 — dispatch a fresh implementer on a more capable model** (per
-Model Selection), with the brief path, the report-file path, the open
-findings, and this framing: "A prior implementer attempted this task
-[N] times; you own it now. Read the report file for what was tried." A loop
-that survives three resumes usually means the implementer cannot see its
-own problem — fresh eyes and a capability bump in one move.
+**第 1-2 轮 —— 恢复原实现者。** 把未决发现逐字发给它。它的上下文完好：它知道这个任务、这份代码、以及它自己的选择。如果你的工具无法给一个在途子代理再发一条消息，就派发一个携带简报路径、报告文件路径和发现清单的全新实现者——无论哪种方式，报告文件都是持久记忆。
 
-**Every round, either way:** the implementer fixes, re-runs the tests
-covering the amended code, appends its fix report to the same report file,
-and returns the short contract. Before re-dispatching the reviewer, confirm
-the fix report contains the covering tests, the command run, and the
-output; dispatch the re-review once all three are present. Name the
-covering test files in the fix message — a one-line fix does not need the
-whole suite.
+**第 3 轮 —— 在更强的模型上派发全新实现者**（按模型选择一节），携带简报路径、报告文件路径、未决发现，以及这样一段框架："一位前序实现者尝试过这个任务 [N] 次；现在归你了。请阅读报告文件了解尝试过什么。"一个活过三次恢复的循环通常意味着实现者看不见自己的问题——换新眼睛和加能力一次到位。
 
-**The re-review is scoped.** Run `scripts/review-package PLAN_FILE FIX_BASE HEAD`
-where FIX_BASE is the head the previous review saw, and dispatch
-[re-review-prompt.md](re-review-prompt.md) with the findings list, the
-brief, the report file, and the printed diff path. The re-reviewer verdicts
-each finding ADDRESSED or NOT ADDRESSED and flags new breakage in the fix
-diff only. New Critical/Important breakage in the fix diff joins the open
-findings list. Out-of-scope observations go to the ledger as deferred
-minors — they never extend the loop.
+**每一轮，无论哪种方式：** 实现者修复、重跑覆盖被改代码的测试、把修复报告追加到同一份报告文件、返回简短契约。在重新派发审查者之前，确认修复报告里包含覆盖测试、运行过的命令和输出；三者齐备后再派发复审。在修复消息中点名覆盖测试文件——一行修复不需要跑整个套件。
 
-**After each round,** append to the ledger:
-`Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
+**复审是限定范围的（scoped）。** 运行 `scripts/review-package PLAN_FILE FIX_BASE HEAD`，其中 FIX_BASE 是上一轮审查看到的 head，并把 [re-review-prompt.md](re-review-prompt.md) 连同发现清单、简报、报告文件和打印出的 diff 路径一起派发。复审者对每条发现给出"已解决（ADDRESSED）"或"未解决（NOT ADDRESSED）"的裁定，并且只标记修复 diff 中新增的破坏。修复 diff 里新增的 Critical/Important 破坏加入未决发现清单。范围外的观察记入台账作为延后的 minor——它们永远不会延长循环。
 
-Never fix findings yourself in the controller session — your context stays
-clean for coordination, and controller fixes skip review.
+**每一轮之后，** 向台账追加：`Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
 
-**The breaker.** When round 5's re-review still leaves findings open, stop
-dispatching. Adjudicate each open finding yourself — you hold the plan and
-the cross-task context the reviewer lacks:
+永远不要在控制器会话里亲手修复发现——你的上下文要留给协调保持干净，而且控制器亲手修复会跳过审查。
 
-- **The reviewer is wrong, or the point is contestable:** park it —
-  `Task <N>: parked — <finding> — Ruling: <why the code stands>`. The final
-  review sees both sides.
-- **Real, but nothing downstream builds on it:** park it the same way, with
-  a ruling that says it's real and deferred.
-- **Real and load-bearing** — a later task builds on it, or it reveals a
-  plan defect: rule on the smallest change that unblocks the dependent work,
-  ledger it as `Task <N>: Ruling: <finding> — <what you decided and why>`,
-  and carry it into the next task's dispatch. Parking a structural failure
-  silently lets every dependent task build on it. Stop only when the defect
-  leaves every path forward a guess.
+**熔断器（The breaker）。** 当第 3 轮复审仍有未决发现时，停止派发。由你亲自逐条裁决每条未决发现——计划与跨任务上下文在你手里，而审查者没有：
 
-Adjudicate only at the cap. Adjudicating earlier to end a loop is
-pre-judging with a different name. Every adjudication is a ledger entry —
-a silent discard is forbidden.
+- **审查者错了，或观点本身有争议：** 停放它——`Task <N>: parked — <finding> — Ruling: <why the code stands>`。最终审查会看到双方意见。
+- **是真的，但没有任何下游构建在它之上：** 用同样的方式停放，裁决里写明"它是真的，延后处理"。
+- **是真的且承重（load-bearing）**——后续任务要建立在它之上，或它暴露了计划缺陷：对"能解除依赖方阻塞的最小改动"做出裁决，记入台账为 `Task <N>: Ruling: <finding> — <what you decided and why>`，并把它带进下一个任务的派发。静默停放一个结构性失败，会让每个依赖任务都悄悄建在它上面。只有当缺陷让一切前进方向都只能靠猜时才停下。
 
-### 5. Complete the task
+只在触顶时裁决。为了提前结束循环而早做裁决，就是换了个名字的预判。每一次裁决都是一条台账记录——静默丢弃是被禁止的。
 
-When the review comes back clean — or every open finding is parked with a
-ruling at the cap — append the completion line to the ledger in the same
-message as your other bookkeeping:
+### 5. 完成任务
+
+当审查干净地返回——或在触顶时每条未决发现都已带裁决停放——把完成行追加到台账，和你的其他记账放在同一条消息里：
 
 - `Task <N>: complete (commits <base7>..<head7>, review clean)`
-- `Task <N>: complete (commits <base7>..<head7>, <K> parked)` after a
-  tripped breaker
+- 熔断器触发后：`Task <N>: complete (commits <base7>..<head7>, <K> parked)`
 
-Then mark the todo complete and move on. Never move to the next task while
-the review has open Critical/Important issues that are neither fixed nor
-parked-with-ruling at the cap.
+然后把 todo 标记为完成并继续。当审查仍有既未修复、也未在触顶时带裁决停放的 Critical/Important 问题时，绝不要进入下一个任务。
 
-## Final Review
+## 最终审查（Final Review）
 
-The final whole-branch review gets a package too: run
-`scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
-branch started from, e.g. `git merge-base main HEAD`) and include the
-printed path in the final review dispatch, so the final reviewer reads
-one file instead of re-deriving the branch diff with git commands. Dispatch
-on the most capable available model (see Model Selection), using
-superpowers:requesting-code-review's
-[code-reviewer.md](../requesting-code-review/code-reviewer.md). Point it at
-the ledger's deferred-minor and parked lines so it can triage which must be
-fixed before merge.
+最终的全分支审查也要一个包：运行 `scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支起始的提交，例如 `git merge-base main HEAD`），把打印出的路径放进最终审查的派发里，这样最终审查者读一个文件即可，不必用 git 命令重新推导分支 diff。用当前可用能力最强的模型派发（见"模型选择"），模板用 superpowers:requesting-code-review 的 [code-reviewer.md](../requesting-code-review/code-reviewer.md)。把它指向台账里的延后 minor 行和停放行，让它分诊哪些必须在合并前修掉。
 
-If the final whole-branch review returns findings, dispatch ONE fix subagent
-with the complete findings list — not one fixer per finding.
-Per-finding fixers each rebuild context and re-run suites; a real
-session's final-review fix wave cost more than all its tasks combined.
-Then run exactly one scoped re-review of the fix wave
-(`scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
-[re-review-prompt.md](re-review-prompt.md)).
-Adjudicate any residual findings as in the task loop's breaker: park with
-rulings, or rule on the load-bearing ones and ledger what you decided. Only
-the four classes above stop you here. There is no second fix wave —
-residual load-bearing findings surface to your human partner when
-finishing-a-development-branch presents the options.
+如果最终的全分支审查返回了发现，派发**一个**修复子代理携带完整发现清单——而不是每条发现一个修复者。逐条派修复者会让每个都重建上下文、重跑套件；一次真实会话的最终审查修复波，成本超过其所有任务之和。然后对修复波恰好做一次限定范围复审（在修复范围上运行 `scripts/review-package PLAN_FILE FIX_BASE HEAD`，用 [re-review-prompt.md](re-review-prompt.md)）。任何残余发现按任务循环里的熔断器方式裁决：带裁决停放，或对承重项做出裁决并把决定记入台账。只有上面那四类事能在此处让你停下。**没有第二轮修复波**——残余的承重发现会在 finishing-a-development-branch 呈现选项时浮出水面给你的（人类）搭档。
 
-## Finish
+## 收尾（Finish）
 
-Before you delete anything, collect every ledger line containing `Ruling:` —
-preflight rulings, parked findings, breaker adjudications, all of them — into
-your final message under "Rulings I made", in the order you made them, each
-with what it costs if wrong. The list is exhaustive: if the ledger holds a
-ruling, the list holds it. That list is the only place the decisions you
-took on your human partner's behalf reach them — they read it and rework
-whatever you got wrong. A ruling that dies with the workspace was a decision
-made in secret.
+在你删除任何东西之前，把台账里所有含 `Ruling:` 的行收集起来——预检裁决、停放发现、熔断器裁定，全部——按你做出的先后顺序，放进你最后一条消息里"我做出的裁决（Rulings I made）"标题之下，每一条都带上"如果错了代价是什么"。清单必须是穷尽的：只要台账里有一条裁决，清单里就得有它。这份清单是你替（人类）搭档做的决定抵达他们的唯一途径——他们读它，然后返工任何你做错的部分。一条随工作区一起死掉的裁决，就是一次秘密做出的决定。
 
-When the final whole-branch review is clean and its fixes are merged,
-delete this plan's workspace (`rm -rf <workspace>`) — the git history is
-the record now. Sibling directories belong to other plans; leave them
-alone.
+当最终全分支审查干净、其修复已合并后，删除本计划的工作区（`rm -rf <workspace>`）——从此 git 历史就是记录。同级目录属于其他计划；别碰它们。
 
-Use superpowers:finishing-a-development-branch.
+使用 superpowers:finishing-a-development-branch。
 
-## Common Rationalizations
+## 常见合理化借口（Common Rationalizations）
 
-| Excuse | Reality |
-|--------|---------|
-| "Close enough on spec compliance" | Reviewer found spec gaps = not done. Fix or hit the cap and adjudicate — those are the only exits. |
-| "I'll fix it myself, dispatching is overhead" | Controller fixes pollute your context and skip review. Resume the implementer. |
-| "One more round will converge" | Past the cap, rounds don't converge — the failure is structural. Adjudicate and route. |
-| "The reviewer will just find something new anyway" | Scoped re-reviews verify fixes; they cannot wander. New findings on untouched code go to the ledger, not the loop. |
-| "This finding is obviously wrong, I'll drop it" | You adjudicate only at the cap, and every ruling is a ledger entry. Silent discards are forbidden. |
-| "The fix was small, skip the re-review" | Unreviewed fixes are how regressions land. Every round ends with a scoped re-review. |
-| "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
-| "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
-| "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
+| 借口 | 现实 |
+|------|------|
+| "规格符合性差不多就行" | 审查者发现了规格缺口 = 没做完。修复，或触顶后裁决——只有这两条出路。 |
+| "我自己修吧，派发太折腾" | 控制器亲手修复会污染你的上下文并跳过审查。恢复实现者。 |
+| "再来一轮就会收敛" | 越过上限之后，轮次不会收敛——失败是结构性的。裁决并分流。 |
+| "审查者反正又会找到新问题" | 限定范围复审只验证修复；它不能跑题。未改动代码上的新发现进台账，不进循环。 |
+| "这条发现明显是错的，我扔了它" | 你只在触顶时裁决，而每次裁决都是一条台账记录。静默丢弃被禁止。 |
+| "修复很小，跳过复审" | 未经审查的修复就是回归（regression）落地的方式。每一轮都以一次限定范围复审收尾。 |
+| "审查拖慢循环" | 没有审查的循环只是未经验证的瞎折腾。审查是循环的刹车和方向盘。 |
+| "台账记账是开销" | 台账是能在压缩中幸存的东西。没有台账的控制器曾把整段已完成任务序列重新派发了一遍。 |
+| "实现者自己派了个审查者——免费的额外保障" | 那是审查同一份 diff 的重复席位；任务审查才是关卡。工作者自派审查者是需要标记的缺陷，不是严谨。 |
 
-## Example Workflow
+## 示例工作流（Example Workflow）
 
 ```
-You: I'm using Subagent-Driven Development to execute this plan.
+你：我正在用 Subagent-Driven Development（子代理驱动开发）执行这份计划。
 
-[Setup: worktree verified]
-[Read plan file once: docs/superpowers/plans/feature-plan.md]
-[Resolve workspace: scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
-[Create todos for all tasks]
+[准备：worktree 已核实]
+[通读计划文件一次：docs/superpowers/plans/feature-plan.md]
+[解析工作区：scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — 里面没有台账，全新开始]
+[为所有任务创建 todos]
 
-Task 1: Hook installation script
+任务 1：钩子安装脚本
 
-[Run task-brief for Task 1; dispatch implementer with brief + report paths + context]
+[为任务 1 运行 task-brief；携带简报 + 报告路径 + 上下文派发实现者]
 
-Implementer: "Before I begin - should the hook be installed at user or system level?"
+实现者："开始之前——钩子应该装在用户级还是系统级？"
 
-You: "User level (~/.config/superpowers/hooks/)"
+你："用户级（~/.config/superpowers/hooks/）"
 
-Implementer: [Later]
-  - Implemented install-hook command
-  - Added tests, 5/5 passing
-  - Self-review: Found I missed --force flag, added it
-  - Committed
+实现者：[稍后]
+  - 实现了 install-hook 命令
+  - 添加了测试，5/5 通过
+  - 自审：发现漏了 --force 标志，已补上
+  - 已提交
 
-[Run review-package PLAN_FILE BASE HEAD; dispatch task reviewer with the printed path]
-Task reviewer: Spec ✅ - all requirements met, nothing extra.
-  Strengths: Good test coverage, clean. Issues: None. Task quality: Approved.
+[运行 review-package PLAN_FILE BASE HEAD；用打印出的路径派发任务审查者]
+任务审查者：规格 ✅ - 所有需求都满足，没有多余的东西。
+  优点：测试覆盖好，干净。问题：无。任务质量：通过（Approved）。
 
-[Ledger: Task 1: complete (commits a1b2c3d..d4e5f6a, review clean)]
+[台账：Task 1: complete (commits a1b2c3d..d4e5f6a, review clean)]
 
-Task 2: Recovery modes
+任务 2：恢复模式（Recovery modes）
 
-[Run task-brief for Task 2; dispatch implementer with brief + report paths + context]
+[为任务 2 运行 task-brief；携带简报 + 报告路径 + 上下文派发实现者]
 
-Implementer: [No questions]
-  - Added verify/repair modes
-  - 8/8 tests passing
-  - Committed
+实现者：[没有问题]
+  - 添加了 verify/repair 模式
+  - 8/8 测试通过
+  - 已提交
 
-[Run review-package PLAN_FILE BASE HEAD; dispatch task reviewer with the printed path]
-Task reviewer: Spec ❌:
-  - Missing: Progress reporting (spec says "report every 100 items")
-  Issues (Important): Magic number (100)
+[运行 review-package PLAN_FILE BASE HEAD；用打印出的路径派发任务审查者]
+任务审查者：规格 ❌：
+  - 缺失：进度报告（规格说"每 100 项报告一次"）
+  问题（Important）：魔法数字（100）
 
-[Fix round 1: resume the implementer with both findings]
-Implementer: Added progress reporting, extracted PROGRESS_INTERVAL constant.
-  Re-ran test/recovery.test.js — 10/10 passing. Fix report appended.
+[修复轮 1：带着两条发现恢复实现者]
+实现者：添加了进度报告，抽出了 PROGRESS_INTERVAL 常量。
+  重跑了 test/recovery.test.js —— 10/10 通过。修复报告已追加。
 
-[Run review-package PLAN_FILE FIX_BASE HEAD; dispatch scoped re-review]
-Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
-  Magic number — ADDRESSED (src/recovery.js:7). New breakage: none.
-  Verdict: all findings addressed.
+[运行 review-package PLAN_FILE FIX_BASE HEAD；派发限定范围复审]
+复审者：缺失进度报告 —— 已解决（ADDRESSED）（src/recovery.js:41）。
+  魔法数字 —— 已解决（ADDRESSED）（src/recovery.js:7）。新增破坏：无。
+  裁定：所有发现均已解决。
 
-[Ledger: Task 2: fix round 1/5 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e)]
-[Ledger: Task 2: complete (commits d4e5f6a..b7c8d9e, review clean)]
+[台账：Task 2: fix round 1/5 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e)]
+[台账：Task 2: complete (commits d4e5f6a..b7c8d9e, review clean)]
 
 ...
 
-[After all tasks]
-[Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer, most capable model]
-Final reviewer: All requirements met. Deferred minors triaged: none block merge.
+[所有任务完成之后]
+[运行 review-package PLAN_FILE MERGE_BASE HEAD；用最强的模型派发最终代码审查者]
+最终审查者：所有需求都满足。延后的 minor 已分诊：无一阻塞合并。
 
-[Delete this plan's workspace — the record now lives in git]
+[删除本计划的工作区 —— 记录从此活在 git 里]
 
-Done! Using superpowers:finishing-a-development-branch.
+完成！使用 superpowers:finishing-a-development-branch。
 ```
