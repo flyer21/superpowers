@@ -1,31 +1,29 @@
 ---
 name: requesting-code-review
-description: 在完成任务、实现重大特性或合并之前使用，以核实工作是否符合需求
+description: 在实施计划中的所有任务执行完成之后、合并到主分支之前使用，以核实整体工作是否符合需求
 ---
 
 # 请求代码评审（Requesting Code Review）
 
-派发一个代码评审子代理，让问题在级联扩散之前就被抓住。评审者拿到的是为评估而精心构造的上下文——绝不是你的会话历史。
+派发一个代码评审子代理，让问题在被合并进主分支、扩散成更大范围的问题之前就被抓住。评审者拿到的是为评估而精心构造的上下文——绝不是你的会话历史。
 
-**核心原则：** 尽早评审，经常评审。
+**核心原则：** 在所有任务执行完成之后才进入整体代码评审——它是交付前的收尾关卡，不是任务之间的例行步骤。
 
 ## 何时请求评审（When to Request Review）
 
-**必须（Mandatory）：**
-<!-- - 在 subagent-driven development 中完成每个任务之后 -->
-<!-- - 完成重大特性之后 -->
-- 合并到主分支之前
+**必须（Mandatory）——只有以下时机才进入本技能：**
+- 实施计划（或整段工作）中的**所有任务都已执行完成**之后：对全部交付内容做一次整体评审
+- 合并到主分支之前：作为合并前的最后一道确认
 
-**可选但有价值（Optional but valuable）：**
-- 卡住的时候（换个新鲜视角）
-- 重构之前（基线检查）
-- 修复复杂 bug 之后
+**不要（Never）在以下时机进入本技能：**
+- 计划执行中途、刚完成个别任务时——单任务把关属于执行流程内部（例如 subagent-driven development 每个任务之后的规格/质量审查），不要打断执行去请求整体评审
+- 卡住、重构前或修复复杂 bug 之后想找人看看时——先用相应技能解决眼前的问题，整体代码评审一律留到所有任务执行完成之后
 
 ## 如何请求（How to Request）
 
 **1. 获取 git SHA：**
 ```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
+BASE_SHA=$(git merge-base main HEAD)  # 整段工作的起始提交；简单场景可用 HEAD~1 或 origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
@@ -48,16 +46,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 ## 示例（Example）
 
 ```
-[刚完成 Task 2：添加验证函数]
+[实施计划中的所有任务（Task 1-3）都已执行完成，工作已全部提交在分支上]
 
-你：在继续之前，我先请求一次代码评审。
+你：所有任务都完成了，现在进入整体代码评审。
 
-BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | awk '{print $1}')
+BASE_SHA=$(git merge-base main HEAD)   # 这段工作的起始提交
 HEAD_SHA=$(git rev-parse HEAD)
 
 [派发代码评审子代理]
-  DESCRIPTION: 添加了 verifyIndex() 和 repairIndex()，覆盖 4 种问题类型
-  PLAN_OR_REQUIREMENTS: docs/superpowers/plans/deployment-plan.md 中的 Task 2
+  DESCRIPTION: 按计划完成全部任务：添加了 verifyIndex() 和 repairIndex()，覆盖 4 种问题类型
+  PLAN_OR_REQUIREMENTS: docs/superpowers/plans/deployment-plan.md（全部任务）
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
@@ -66,10 +64,10 @@ HEAD_SHA=$(git rev-parse HEAD)
   Issues:
     Important: 缺少进度指示器
     Minor: 报告间隔的魔法数字（100）
-  Assessment: 可以继续
+  Assessment: 需要修复（With fixes）
 
-你：[修复进度指示器]
-[继续到 Task 3]
+你：[修复进度指示器，重跑相关测试]
+[对修复范围做一次限定范围复审，确认干净后] 进入合并，使用 superpowers:finishing-a-development-branch 收尾。
 ```
 
 ## 常见的自我合理化（Common Rationalizations）
