@@ -12,8 +12,8 @@ description: 在完成任务、实现重大特性或合并之前使用，以核�
 ## 何时请求评审（When to Request Review）
 
 **必须（Mandatory）：**
-- 在 subagent-driven development 中完成每个任务之后
-- 完成重大特性之后
+<!-- - 在 subagent-driven development 中完成每个任务之后 -->
+<!-- - 完成重大特性之后 -->
 - 合并到主分支之前
 
 **可选但有价值（Optional but valuable）：**
