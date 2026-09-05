@@ -1,21 +1,21 @@
 # 限定范围复审提示词模板（Scoped Re-Review Prompt Template）
 
-在修复轮之后派发复审时使用本模板。复审者验证发现是否已解决，并检查修复 diff 有没有引入新的破坏。它不是一次全新的审查——完整审查已经发生过。
+在统一审查的修复波之后派发复审时使用本模板。复审者验证发现是否已解决，并检查修复 diff 有没有引入新的破坏。它不是一次全新的审查——统一审查已经发生过。
 
 **用途（Purpose）：** 验证上一轮审查的每条发现都已解决，并且修复本身没有破坏任何东西。
 
 ```
 Subagent (general-purpose):
-  description: "Re-review Task N fix round R"
+  description: "Re-review fix wave"
   model: [MODEL — 必填：按 SKILL.md 的"模型选择"选择；省略 model 会
          悄悄继承会话中最贵的那个]
   prompt: |
-    你正在复审某个任务的一轮修复。上一轮审查产生了若干发现；实现者已尝试修复它们。
+    你正在复审整条分支上的一次修复波。统一审查产生了若干发现；实现者已尝试修复它们。
     你的工作是逐条裁定每条发现、并检查修复 diff——仅此而已。
 
     ## 任务
 
-    阅读任务简报：[BRIEF_FILE]
+    阅读控制器给你的上下文——相关任务简报与报告文件（修复报告追加在末尾）：[BRIEF_FILE] / [REPORT_FILE]
 
     ## 待验证的发现
 
@@ -23,9 +23,7 @@ Subagent (general-purpose):
 
     ## 修复
 
-    阅读实现者的报告（修复报告追加在末尾）：[REPORT_FILE]
-
-    **修复基线（Fix base）：** [FIX_BASE_SHA]（上一轮审查看到的 head）
+    **修复基线（Fix base）：** [FIX_BASE_SHA]（统一审查看到的 head）
     **Head：** [HEAD_SHA]
     **Diff 文件：** [DIFF_FILE]
 
@@ -49,8 +47,8 @@ Subagent (general-purpose):
     你的范围是发现清单和修复 diff。逐条裁定每条发现。检查修复 diff 有没有
     修复本身引入的新问题。不要复审修复未触碰的代码：如果你注意到一个完全
     在修复 diff 之外的问题，把它记在"范围外观察"（Out-of-Scope
-    Observations）下——它不阻塞本任务，也不会延长循环。宽泛的全分支审查
-    会在所有任务完成之后进行。
+    Observations）下——它不阻塞本任务，也不会延长修复波。整条分支的完整
+    评审已经由统一审查完成——你只验证这次修复。
 
     ## 测试
 
@@ -80,20 +78,20 @@ Subagent (general-purpose):
     ### 范围外观察
 
     你注意到的、完全在修复 diff 之外的问题。不阻塞；控制器会把这些记入
-    台账供最终审查。没有则写 "None"。
+    台账供收尾时分诊。没有则写 "None"。
 
     ### 裁定
 
-    **修复轮：** [所有发现已解决、且无新的 Critical/Important 破坏 |
+    **修复波：** [所有发现已解决、且无新的 Critical/Important 破坏 |
     仍有未决发现] —— 列出未决的。
 ```
 
 **占位符说明（Placeholders）：**
 - `[MODEL]` — 必填：按 SKILL.md 的"模型选择"选择审查模型；对小型修复 diff 的限定范围复审用便宜到中档的档次
-- `[BRIEF_FILE]` — 任务简报文件（实现者据以工作的同一份文件）
-- `[FINDINGS]` — 上一轮审查的 Critical/Important 发现与规格缺口，逐字复制，每条一个要点
-- `[REPORT_FILE]` — 实现者的报告文件（修复报告已追加）
-- `[FIX_BASE_SHA]` — 上一轮审查看到的 head
+- `[BRIEF_FILE]` — 修复涉及的任务简报文件；发现横跨多个任务时给相关简报（或台账指针）
+- `[FINDINGS]` — 统一审查的 Critical/Important 发现与规格缺口，逐字复制，每条一个要点
+- `[REPORT_FILE]` — 相关实现者的报告文件（修复报告已追加）
+- `[FIX_BASE_SHA]` — 统一审查看到的 head
 - `[HEAD_SHA]` — 当前提交
 - `[DIFF_FILE]` — `scripts/review-package PLAN_FILE FIX_BASE HEAD` 打印出的路径
 
