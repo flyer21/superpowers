@@ -85,12 +85,12 @@ echo "=== All tests passed ==="
 #### test-subagent-driven-development.sh
 Tests skill content and requirements (~2 minutes):
 - Skill loading and accessibility
-- Workflow ordering (spec compliance before code quality)
-- Self-review requirements documented
-- Plan reading efficiency documented
-- Spec compliance reviewer skepticism documented
-- Review loops documented
-- Task context provision documented
+- Whole-branch self-review covers spec compliance and code quality
+- No per-task self-review (single whole-branch self-review after all tasks)
+- Plan reading efficiency documented (read once up front, not per task)
+- Self-review verifies the code, not the report
+- Single fix wave documented (controller re-checks; no second wave)
+- Task context provision via task brief files documented
 
 ### Integration Tests (use --integration flag)
 
@@ -100,11 +100,11 @@ Full workflow execution test (~10-30 minutes):
 - Creates implementation plan with 2 tasks
 - Executes plan using subagent-driven-development
 - Verifies actual behaviors:
-  - Plan read once at start (not per task)
-  - Full task text provided in subagent prompts
-  - Subagents perform self-review before reporting
-  - Spec compliance review happens before code quality
-  - Spec reviewer reads code independently
+  - Plan read once up front (not per task)
+  - Task text provided via task briefs (implementers don't read the whole plan)
+  - No per-task self-review: implement -> test -> commit -> report
+  - Controller's whole-branch self-review covers spec compliance and code quality
+  - Self-review reads the actual branch diff, not the reports
   - Working implementation is produced
   - Tests pass
   - Proper git commits created
