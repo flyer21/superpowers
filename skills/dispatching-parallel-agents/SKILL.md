@@ -61,7 +61,6 @@ digraph when_to_use {
 - **明确的范围：** 一个测试文件或一个子系统
 - **清晰的目标：** 让这些测试通过
 - **约束：** 不要改动其他代码
-- **期望的输出：** 一份"你发现了什么、修复了什么"的总结
 
 ### 3. 并行派发
 
@@ -76,12 +75,10 @@ Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
 
 一条响应里的多次派发调用 = 并行执行。一次只有一条 = 顺序执行。
 
-### 4. 审查与整合
+### 4. 整合
 
 当子代理返回时：
-- 阅读每份总结
-- 验证各修复之间没有冲突
-- 运行完整测试套件
+- 运行完整测试套件，确认所有修复能协同工作
 - 整合所有改动
 
 ## 子代理提示词的结构（Agent Prompt Structure）
@@ -89,7 +86,7 @@ Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
 好的子代理提示词具备：
 1. **聚焦（Focused）** - 单一清晰的问题域
 2. **自包含（Self-contained）** - 包含理解问题所需的全部上下文
-3. **明确指定输出（Specific about output）** - 子代理应当返回什么？
+3. **不做多余要求（No extra asks）** - 不要求子代理审查或写总结，让它们专注完成修复
 
 ```markdown
 修复 src/agents/agent-tool-abort.test.ts 中失败的 3 个测试：
@@ -108,8 +105,6 @@ Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
    - 如果被测行为已经改变，则调整测试期望
 
 不要只是调大超时——找出真正的问题。
-
-返回：一份"你发现了什么、修复了什么"的总结。
 ```
 
 ## 常见错误（Common Mistakes）
@@ -123,8 +118,8 @@ Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
 **❌ 没有约束：** 子代理可能把一切都重构一遍
 **✅ 给出约束：** "不要改动生产代码" 或 "只修测试"
 
-**❌ 输出含糊：** "修好它" - 你无从得知改了什么
-**✅ 输出具体：** "返回根本原因与改动的总结"
+**❌ 要总结：** "返回你发现了什么、修复了什么" - 打断子代理的专注
+**✅ 只修：** 子代理修好就行，其余交给测试套件验证
 
 ## 何时不要用（When NOT to Use）
 
@@ -157,11 +152,3 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 - 子代理 3：增加了对异步工具执行完成的等待
 
 **整合：** 所有修复彼此独立、无冲突，完整套件全绿
-
-## 验证（Verification）
-
-子代理返回之后：
-1. **审阅每份总结** - 了解改了什么
-2. **检查冲突** - 子代理是否编辑了同一份代码？
-3. **运行完整套件** - 验证所有修复能协同工作
-4. **抽查** - 子代理可能会犯系统性错误
