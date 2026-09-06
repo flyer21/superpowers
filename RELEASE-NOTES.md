@@ -1,6 +1,6 @@
 # Superpowers Release Notes
 
-## v6.3.0 (2026-08-12)
+## v6.3.1 (2026-08-12)
 
 ### Harness Support
 
