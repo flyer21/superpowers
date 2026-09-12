@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Zip stores no timezone: it records entry timestamps as local time. The
+# packaging script normalizes entries to 1980-01-01 00:00 UTC, so the archive
+# only reads back as (1980, 1, 1, 0, 0, 0) when the archiver runs in UTC.
+# Pin the timezone so the assertions are machine-independent.
+export TZ=UTC
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/package-codex-plugin.sh"
