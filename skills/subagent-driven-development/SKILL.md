@@ -57,7 +57,7 @@ digraph process {
         "Implementer asks questions?" [shape=diamond];
         "Answer questions, provide context" [shape=box];
         "Implementer implements, tests, commits, reports" [shape=box];
-        "Record completion in ledger, mark todo complete" [shape=box];
+        "Record completion in ledger, tick plan checkboxes, mark todo complete" [shape=box];
     }
 
     "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
@@ -72,8 +72,8 @@ digraph process {
     "Implementer asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Implementer implements, tests, commits, reports";
     "Implementer asks questions?" -> "Implementer implements, tests, commits, reports" [label="no"];
-    "Implementer implements, tests, commits, reports" -> "Record completion in ledger, mark todo complete";
-    "Record completion in ledger, mark todo complete" -> "More tasks remain?";
+    "Implementer implements, tests, commits, reports" -> "Record completion in ledger, tick plan checkboxes, mark todo complete";
+    "Record completion in ledger, tick plan checkboxes, mark todo complete" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Whole-branch self-review (you read the full diff, plan, ledger)" [label="no"];
     "Whole-branch self-review (you read the full diff, plan, ledger)" -> "Fix wave: up to 3 rounds, one fix dispatch + self re-check each";
@@ -94,7 +94,7 @@ digraph process {
 - 台账是你的恢复地图：其中点名的提交在 git 里真实存在，即使你的上下文已不记得创建过它们。压缩之后，相信台账和 `git log`，而不是你自己的记忆。
 - `git clean -fdx` 会摧毁工作区（它是 git 忽略的临时区）；如果发生了，从 `git log` 恢复。
 
-把计划通读一遍，记下它的上下文和全局约束，并为每个任务创建一个 todo。如果计划指名了一份规格说明（Spec），也把它读了：规格是计划据以论证的权威，计划内部的冲突以它为最终裁决。没有可达规格的计划要在台账里记一笔说明——缺少规格做出的裁决都是暂时性的。
+把计划通读一遍，记下它的上下文和全局约束，并为每个任务创建一个 todo。计划的步骤用 `- [ ]` 复选框声明进度；某个任务完成时，由你把它各步骤的复选框勾成 `- [x]`——复选框是给（人类）搭档看的进度视图，压缩恢复仍以台账为准。如果计划指名了一份规格说明（Spec），也把它读了：规格是计划据以论证的权威，计划内部的冲突以它为最终裁决。没有可达规格的计划要在台账里记一笔说明——缺少规格做出的裁决都是暂时性的。
 
 在派发任务 1 之前，先通扫一遍计划找冲突，边查边记下你查了什么：
 
@@ -154,7 +154,7 @@ digraph process {
 
 实现者子代理会报告四种状态之一。请分别恰当地处理：
 
-**DONE：** 把完成行追加到台账（`任务 <N>: 完成 (提交 <base7>..<head7>, <测试摘要>)`），把 todo 标记为完成，然后直接派发下一个任务——测试通过后不需要任何报告文件或额外产物。**任务内不做自审，任务之间也不派发任何审查者**——整分支自审只发生在所有任务执行完成之后（见 3. 整分支自审）。`<base7>` 是你在派发实现者前记录的提交——绝不要用 `HEAD~1`，它会悄悄丢掉多任务提交除最后一笔外的所有提交。`<test summary>` 取自实现者最终汇报里的一行测试摘要（例如 "14/14 passing"），整分支自审会拿它当"不重跑测试"的依据。
+**DONE：** 把完成行追加到台账（`任务 <N>: 完成 (提交 <base7>..<head7>, <测试摘要>)`），把 todo 标记为完成，并把计划文件中该任务各步骤的复选框勾成 `- [x]`，然后直接派发下一个任务——测试通过后不需要任何报告文件或额外产物。**任务内不做自审，任务之间也不派发任何审查者**——整分支自审只发生在所有任务执行完成之后（见 3. 整分支自审）。`<base7>` 是你在派发实现者前记录的提交——绝不要用 `HEAD~1`，它会悄悄丢掉多任务提交除最后一笔外的所有提交。`<test summary>` 取自实现者最终汇报里的一行测试摘要（例如 "14/14 passing"），整分支自审会拿它当"不重跑测试"的依据。
 
 **DONE_WITH_CONCERNS：** 实现者完成了工作，但标注了疑虑。继续之前先读这些顾虑。如果顾虑涉及正确性、或会让后续任务建立在不可靠的基础上——先处理它：做出裁决并（必要时）派同一实现者做一次小修复，把修复与裁决追加到台账，再继续。如果只是观察或风格层面的东西（例如"这个文件在变大"），记入台账作为延后项，继续下一个任务；整分支自审会看到它们。
 
@@ -222,11 +222,11 @@ digraph process {
 
 然后把所有 todo 标记为完成。至此全部任务执行完成、整分支自审与修复波全部结束。
 
-**归档执行台账（所有任务完成后必做）：** 把 `<workspace>/progress.md` 复制到计划文件旁：`<plan 同目录>/<plan-basename>-ledger.md`，并把它提交进分支：
+**归档执行台账（所有任务完成后必做）：** 把 `<workspace>/progress.md` 复制到计划文件旁：`<plan 同目录>/<plan-basename>-ledger.md`，并把它、连同你逐任务勾选了复选框的计划文件一起提交进分支（计划文件里的勾选只随这次提交落盘）：
 
 ```bash
 cp <workspace>/progress.md <plan-dir>/<plan-basename>-ledger.md
-git add <plan-dir>/<plan-basename>-ledger.md
+git add <plan-dir>/<plan-basename>-ledger.md <plan-file>
 git commit -m "docs(sdd): archive <plan-basename> ledger"
 ```
 
@@ -285,6 +285,7 @@ git commit -m "docs(sdd): archive <plan-basename> ledger"
 
 [台账：任务 1: 完成 (提交 a1b2c3d..d4e5f6a, 5/5 通过)]
 [todo：任务 1 已完成]
+[计划：任务 1 各步骤复选框勾成 - [x]]
 
 任务 2：恢复模式（Recovery modes）
 
@@ -299,6 +300,7 @@ git commit -m "docs(sdd): archive <plan-basename> ledger"
 
 [台账：任务 2: 完成 (提交 d4e5f6a..e8f9a0b, 8/8 通过)]
 [todo：任务 2 已完成]
+[计划：任务 2 各步骤复选框勾成 - [x]]
 
 ... （任务 3、4 同此模式：实现 → 测试 → 提交 → 汇报 → 记入台账。任务之间不做审查。）
 
