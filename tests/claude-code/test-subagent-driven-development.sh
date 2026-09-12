@@ -3,12 +3,12 @@
 # Verifies that the skill is loaded and follows the fork's workflow:
 # fresh subagent per task, no per-task self-review, and one whole-branch
 # self-review by the controller after every task has completed (it replaces
-# any external reviewer dispatch), followed by a single fix wave that the
-# controller itself re-checks.
+# any external reviewer dispatch), followed by fix waves (up to three rounds)
+# that the controller itself re-checks.
 #
 # No drill coverage: this test asks the agent to *describe* SDD (string-
 # matches its verbal explanation against expected keywords like
-# "whole-branch self-review", "no second fix wave", "worktree"). Drill
+# "whole-branch self-review", "up to three fix waves", "worktree"). Drill
 # scenarios test behavior (real subagent dispatch, plan-following, review
 # loops), not description-recall. Kept by design.
 #
@@ -136,16 +136,16 @@ fi
 
 echo ""
 
-# Test 6: Verify findings enter one fix wave, re-checked by the controller,
-#         with no second fix wave
-echo "Test 6: One fix wave, controller re-check, no second wave..."
+# Test 6: Verify findings enter fix waves (up to three rounds), each
+#         re-checked by the controller
+echo "Test 6: Fix waves up to three rounds, controller re-checks each..."
 
 output=$(run_claude "关于 subagent-driven-development 中发现问题的处理，请逐字抄写下面每一行并把 X 替换成答案（是 或 否），不要改动其它内容：
-自审发现的问题进入一次修复波：X
+自审发现的 Critical/Important 级问题进入修复波：X
 实现者修复后由控制器亲自复检修复 diff：X
-修复波存在第二轮：X" "$CLAUDE_PROMPT_TIMEOUT")
+修复波最多支持三轮：X" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_contains "$output" "自审发现的问题进入一次修复波[ ]*[：:][ ]*是" "Findings enter a fix wave"; then
+if assert_contains "$output" "自审发现的 Critical/Important 级问题进入修复波[ ]*[：:][ ]*是" "Findings enter fix waves"; then
     : # pass
 else
     exit 1
@@ -157,7 +157,7 @@ else
     exit 1
 fi
 
-if assert_contains "$output" "修复波存在第二轮[ ]*[：:][ ]*否" "No second fix wave"; then
+if assert_contains "$output" "修复波最多支持三轮[ ]*[：:][ ]*是" "Fix waves capped at three rounds"; then
     : # pass
 else
     exit 1

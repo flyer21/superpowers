@@ -8,7 +8,7 @@
 
 ```
 Subagent (general-purpose):
-  description: "Review plan document"
+  description: "评审计划文档"
   prompt: |
     你是一位计划文档评审者。请验证这份计划是否完整、是否已具备实施条件。
 

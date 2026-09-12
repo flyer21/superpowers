@@ -15,7 +15,7 @@ description: 当在当前会话中执行包含相互独立任务的实施计划�
 
 **持续执行：** 不要在任务之间停下来向你的（人类）搭档确认。一口气执行完计划里的所有任务。唯一能让你停下来的理由，是下面点名的四类情况，或所有任务都已完成。"我该继续吗？"式的追问和进度汇报浪费他们的时间——他们让你执行计划，那就执行。
 
-**裁决，而不是卡壳（Rulings, not stalls）。** 一份进行中的计划不会等人。冲突、歧义、计划缺陷、你本想请求突破的上限——都由你来裁决。规格说明是约束性权威，计划是它的论证，而两者都没回答的问题由你的判断来定夺。把每个决定记入台账，格式为 `Ruling: <你决定什么> — <为什么> — <如果错了代价是什么>`，然后继续前进。一次错误的裁决代价是返工，你的搭档看得见、也能撤销；而一个停在问题上的会话会浪费他们一整天，什么也换不来。
+**裁决，而不是卡壳（Rulings, not stalls）。** 一份进行中的计划不会等人。冲突、歧义、计划缺陷、你本想请求突破的上限——都由你来裁决。规格说明是约束性权威，计划是它的论证，而两者都没回答的问题由你的判断来定夺。把每个决定记入台账，格式为 `裁决: <你决定什么> — <为什么> — <如果错了代价是什么>`，然后继续前进。一次错误的裁决代价是返工，你的搭档看得见、也能撤销；而一个停在问题上的会话会浪费他们一整天，什么也换不来。
 
 能让你停下来的只有四类事：不可逆或破坏性操作；涉及安全的动作；本 worktree 之外、按惯例应先征询的副作用（一次合并、推送到共享分支、一次发布）；以及一份破到"任何前进方向都只能靠猜"的计划。遇到这些，停下来问。
 
@@ -63,8 +63,8 @@ digraph process {
     "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Whole-branch self-review (you read the full diff, plan, ledger)" [shape=box];
-    "Fix wave: ONE fix dispatch, self re-check, adjudicate residuals" [shape=box];
-    "Self-review clean: delete this plan's workspace" [shape=box];
+    "Fix wave: up to 3 rounds, one fix dispatch + self re-check each" [shape=box];
+    "Archive ledger beside plan, delete this plan's workspace" [shape=box];
     "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
     "Setup: worktree, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
@@ -76,9 +76,9 @@ digraph process {
     "Record completion in ledger, mark todo complete" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Whole-branch self-review (you read the full diff, plan, ledger)" [label="no"];
-    "Whole-branch self-review (you read the full diff, plan, ledger)" -> "Fix wave: ONE fix dispatch, self re-check, adjudicate residuals";
-    "Fix wave: ONE fix dispatch, self re-check, adjudicate residuals" -> "Self-review clean: delete this plan's workspace";
-    "Self-review clean: delete this plan's workspace" -> "Use superpowers:finishing-a-development-branch";
+    "Whole-branch self-review (you read the full diff, plan, ledger)" -> "Fix wave: up to 3 rounds, one fix dispatch + self re-check each";
+    "Fix wave: up to 3 rounds, one fix dispatch + self re-check each" -> "Archive ledger beside plan, delete this plan's workspace";
+    "Archive ledger beside plan, delete this plan's workspace" -> "Use superpowers:finishing-a-development-branch";
 }
 ```
 
@@ -89,8 +89,8 @@ digraph process {
 会话记忆无法在压缩（compaction）后幸存。在真实会话中，丢失了自己位置的控制器曾把整段已完成的任务序列重新派发了一遍——这是观察到的最昂贵的一次失败。请把进度记在台账（ledger）文件里，而不只是写在 todo 里。
 
 - 每份计划独占一个工作区：技能启动时，运行本技能目录下的 `scripts/sdd-workspace PLAN_FILE`——它会打印该计划对应的 git 忽略目录（`<repo-root>/.superpowers/sdd/<plan-basename>/`），那里存放本计划的所有产物：台账、任务简报、审查包。报告不落盘——实现者的最终汇报就是记录，见"派发实现者"。其他计划的目录永远不是你有权读写的地方。
-- 检查本计划的台账是否在 `<workspace>/progress.md`。如果它的第一行指向你的计划文件，那么带 `Task <N>: complete (commits <base7>..<head7>` 前缀的任务都已完成——不要重新派发它们；从第一个没有该标记的任务继续。最后一行是修复波的记录，说明计划正停在整分支自审的修复波中：从下一轮恢复。第一行指向其他计划文件的台账——或遗留在旧的扁平路径 `.superpowers/sdd/progress.md` 的散落台账——属于其他计划的进度：让它留在原地，你自己从零开始。
-- 以台账的身份标识作为第一行创建台账：`# SDD ledger — plan: <plan file path>`。
+- 检查本计划的台账是否在 `<workspace>/progress.md`。台账内容使用中文。如果它的第一行指向你的计划文件，那么带 `任务 <N>: 完成 (提交 <base7>..<head7>` 前缀的任务都已完成——不要重新派发它们；从第一个没有该标记的任务继续（旧的英文标记 `Task <N>: complete` 同样认——那是本技能改用中文标记之前写下的台账）。最后一行是修复波的记录，说明计划正停在整分支自审的修复波中：从下一轮恢复。第一行指向其他计划文件的台账——或遗留在旧的扁平路径 `.superpowers/sdd/progress.md` 的散落台账——属于其他计划的进度：让它留在原地，你自己从零开始。
+- 以台账的身份标识作为第一行创建台账：`# SDD 执行台账 — 计划: <plan file path>`。
 - 台账是你的恢复地图：其中点名的提交在 git 里真实存在，即使你的上下文已不记得创建过它们。压缩之后，相信台账和 `git log`，而不是你自己的记忆。
 - `git clean -fdx` 会摧毁工作区（它是 git 忽略的临时区）；如果发生了，从 `git log` 恢复。
 
@@ -154,7 +154,7 @@ digraph process {
 
 实现者子代理会报告四种状态之一。请分别恰当地处理：
 
-**DONE：** 把完成行追加到台账（`Task <N>: complete (commits <base7>..<head7>, <test summary>)`），把 todo 标记为完成，然后直接派发下一个任务——测试通过后不需要任何报告文件或额外产物。**任务内不做自审，任务之间也不派发任何审查者**——整分支自审只发生在所有任务执行完成之后（见 3. 整分支自审）。`<base7>` 是你在派发实现者前记录的提交——绝不要用 `HEAD~1`，它会悄悄丢掉多任务提交除最后一笔外的所有提交。`<test summary>` 取自实现者最终汇报里的一行测试摘要（例如 "14/14 passing"），整分支自审会拿它当"不重跑测试"的依据。
+**DONE：** 把完成行追加到台账（`任务 <N>: 完成 (提交 <base7>..<head7>, <测试摘要>)`），把 todo 标记为完成，然后直接派发下一个任务——测试通过后不需要任何报告文件或额外产物。**任务内不做自审，任务之间也不派发任何审查者**——整分支自审只发生在所有任务执行完成之后（见 3. 整分支自审）。`<base7>` 是你在派发实现者前记录的提交——绝不要用 `HEAD~1`，它会悄悄丢掉多任务提交除最后一笔外的所有提交。`<test summary>` 取自实现者最终汇报里的一行测试摘要（例如 "14/14 passing"），整分支自审会拿它当"不重跑测试"的依据。
 
 **DONE_WITH_CONCERNS：** 实现者完成了工作，但标注了疑虑。继续之前先读这些顾虑。如果顾虑涉及正确性、或会让后续任务建立在不可靠的基础上——先处理它：做出裁决并（必要时）派同一实现者做一次小修复，把修复与裁决追加到台账，再继续。如果只是观察或风格层面的东西（例如"这个文件在变大"），记入台账作为延后项，继续下一个任务；整分支自审会看到它们。
 
@@ -178,53 +178,67 @@ digraph process {
 
 - **生成本分支的 diff 并亲自通读：** 从本技能目录运行 `scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支起始的提交，例如 `git merge-base main HEAD`）——它把提交列表、stat 摘要和带上下文的完整 diff 写进一个唯一命名的文件（无 bash 时：把 `git log --oneline`、`git diff --stat` 和分支范围的 `git diff -U10` 重定向到一个唯一命名的文件）。然后亲自 Read 这份 diff——连同计划文件（或规格）与台账——对照计划逐项核实全部任务的功能与质量。diff 文件让你能分遍通读，不必反复跑 git 命令。
 - **逐项对照：** 每个任务一行：台账里的提交范围（`<base7>..<head7>`）和测试摘要在手，按任务简报逐项核实它交付了什么、有没有缺失或越界（多余的"锦上添花"、被计划漏掉的相互作用）。跨任务交互只在整条分支上浮现——这正是只在收尾自审一次而非逐任务审查的价值所在。
-- **分级与去向：** 按实际严重级别分诊。Critical / Important / 规格 ❌ 进修复波；Minor 记入台账延后（`Review: minor (deferred): <one-liner>`）；发现与计划文本冲突时，把发现与计划放到天平上、以规格为约束性权威做出裁决并先记入台账。
+- **分级与去向：** 按实际严重级别分诊。Critical / Important / 规格 ❌ 进修复波；Minor 记入台账延后（`审查: 次要(延后): <一行摘要>`）；发现与计划文本冲突时，把发现与计划放到天平上、以规格为约束性权威做出裁决并先记入台账。
 - **对抗自审的偏差：** 你既是协调者又是审查者——这是把双刃剑。某条发现冒出来时，不要因为它"符合你派发时的设想"、或"实现者已经跑过测试"就顺手降级或放掉：被你自己合理化掉的问题永远回不来。先把它写下来、定级别，再决定去向。如果一条发现让你想写"计划选择了"或"实现者解释过"——停下来：你正在替实现者给自己判作业。
-- **大分支分遍自审：** 如果整条分支大到一次装不下，按文件或组件分批自审，每一批的发现当场记入台账（`Review: <finding> (<severity>) — <file:line> — <why it matters>`）。台账就是跨批与跨压缩的记忆：哪怕中途压缩，下一次也从台账继续，而不是从头再来。
+- **大分支分遍自审：** 如果整条分支大到一次装不下，按文件或组件分批自审，每一批的发现当场记入台账（`审查: <发现> (<严重级别>) — <file:line> — <影响>`）。台账就是跨批与跨压缩的记忆：哪怕中途压缩，下一次也从台账继续，而不是从头再来。
 - 不要为了自审重跑实现者已经在同一份代码上跑过的全套测试——台账为每个任务记录了提交范围与测试摘要。只有当阅读某段代码引发了某个现存结果无法回答的具体疑虑时，才跑一次聚焦测试，并把命令与结果记入台账。
 - 发现落在横跨多个任务交互的需求上、仅凭 diff 无法完全核实时，由你亲自解决——计划与跨任务上下文在你手里。如果你无法从 diff 或计划确认一项需求确实被满足，把它当作真实缺口对待，和其他发现一起进入修复波。
 
-### 4. 修复波
+### 4. 修复波（最多三轮）
 
 当你的整分支自审发现规格 ❌、任何 Critical 或 Important 级别的发现、或一条你无法从 diff 确认的真实缺口时，修复波被触发。
 
+**修复波最多三轮。** 每一轮形状相同：派发**一个**修复子代理修复全部未决发现 → 你亲自对**本轮**修复做一次限定范围复检。复检若干净，修复波结束；若仍有未决发现，把未决清单交给下一轮。三轮用满后仍有未决发现的，由你亲自逐条裁决（见下"熔断器"）——不再派发第四轮。
+
 修复波开始前，有两条路可以立刻离开它：
 
-- 把 Minor 级别的发现随手记入进度台账（`Review: minor (deferred): <one-liner>`）。这些清单随收尾一起抵达你的（人类）搭档，供其分诊哪些必须在合并前修掉。一份没人读的汇总就是静默丢弃。Minor 发现绝不进入修复波。
+- 把 Minor 级别的发现随手记入进度台账（`审查: 次要(延后): <一行摘要>`）。这些清单随收尾一起抵达你的（人类）搭档，供其分诊哪些必须在合并前修掉。一份没人读的汇总就是静默丢弃。Minor 发现绝不进入修复波。
 - 一条被标注为"计划强制要求"的发现——或任何与计划文本要求冲突的发现——由你来裁决：把发现与计划文本放到天平上，以规格作为约束性权威做决定，并在行动之前把裁决记入台账。不要因为"计划就是这么写的"就打发掉发现，也不要在没有记录裁决的情况下派发与计划相抵触的修复。
 
-其余一切进入修复波——整条分支恰好一轮：
+其余一切进入修复波。每一轮：
 
-1. 派发**一个**修复子代理携带完整发现清单——而不是每条发现一个修复者。逐条派修复者会让每个都重建上下文、重跑套件；一次真实会话的修复波成本，可能超过其所有任务之和。优先恢复对应的原实现者（它的上下文完好）；你的工具若无法给在途子代理再发消息，就派发一个携带台账、相关任务简报路径和发现清单的更强模型实现者。给它这样一段框架："控制器对整条分支的自审发现了这些；请阅读台账与任务简报了解上下文。"
+1. 派发**一个**修复子代理携带该轮的完整未决发现清单——而不是每条发现一个修复者。逐条派修复者会让每个都重建上下文、重跑套件；一次真实会话的修复波成本，可能超过其所有任务之和。优先恢复对应的原实现者（它的上下文完好）；你的工具若无法给在途子代理再发消息，就派发一个携带台账、相关任务简报路径和发现清单的更强模型实现者。给它这样一段框架："控制器对整条分支的自审发现了这些；请阅读台账与任务简报了解上下文。"
 2. 实现者修复所有未决发现、为被改代码补上覆盖测试、把修复提交追加到分支——它同样以最终消息汇报，不写报告文件。在你复检之前，确认它的最终汇报里包含覆盖测试、运行过的命令和输出；三者齐备后再复检，并把汇报逐字作为对照依据。在派发修复消息时点名覆盖测试文件——一行修复不需要跑整个套件。
-3. 对修复波恰好做一次你自己的限定范围复检：运行 `scripts/review-package PLAN_FILE FIX_BASE HEAD`，其中 FIX_BASE 是自审看到的 head，自己通读修复 diff，对每条发现给出"已解决（ADDRESSED）"或"未解决（NOT ADDRESSED）"的裁定，并且只标记修复 diff 中新增的破坏。修复 diff 里新增的 Critical/Important 破坏加入未决发现。范围外的观察记入台账作为延后的 minor——它们永远不会延长修复波。复检不是重跑整份自审：你的范围是发现清单和修复 diff。
+3. 对**本轮**修复恰好做一次你自己的限定范围复检：运行 `scripts/review-package PLAN_FILE FIX_BASE HEAD`，其中 FIX_BASE 是上一轮复检看到的 head（第一轮就是整分支自审看到的 head），自己通读本轮修复 diff，对每条未决发现给出"已解决（ADDRESSED）"或"未解决（NOT ADDRESSED）"的裁定，并且只标记本轮修复 diff 中新增的破坏。修复 diff 里新增的 Critical/Important 破坏加入未决发现。范围外的观察记入台账作为延后的 minor——它们永远不会延长修复波。复检不是重跑整份自审：你的范围是未决发现清单和本轮修复 diff。
 
-修复波之后，向台账追加：`Review: fix wave (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
+每轮复检之后，向台账追加：`审查: 修复波 (<轮次>/3, <X> 已解决, <Y> 未决 — <发现一行摘要>; 提交 <a7>..<b7>)`
 
 永远不要在控制器会话里亲手修复发现——你的上下文要留给协调保持干净，而且亲手修复的人不该验自己的修复：它会让这次复检失去意义。
 
-**熔断器（The breaker）。** 当复检仍有未决发现时，停止派发修复。由你亲自逐条裁决每条未决发现——计划与跨任务上下文在你手里：
+**熔断器（The breaker）。** 当三轮用满、复检仍有未决发现时，停止派发修复。由你亲自逐条裁决每条未决发现——计划与跨任务上下文在你手里：
 
-- **发现是误报，或观点本身有争议：** 停放它——`Review: parked — <finding> — Ruling: <why the code stands>`。
+- **发现是误报，或观点本身有争议：** 停放它——`审查: 停放 — <发现> — 裁决: <代码为何成立>`。
 - **是真的，但合并前不承重：** 用同样的方式停放，裁决里写明"它是真的，延后处理"。
-- **是真的且承重（load-bearing）**——会破坏合并后的主分支，或暴露了计划缺陷：对"解除阻塞的最小改动"做出裁决，记入台账为 `Review: Ruling: <finding> — <what you decided and why>`，并把这条残项带进收尾，让它通过 finishing-a-development-branch 呈现给你的（人类）搭档。
+- **是真的且承重（load-bearing）**——会破坏合并后的主分支，或暴露了计划缺陷：对"解除阻塞的最小改动"做出裁决，记入台账为 `审查: 裁决: <发现> — <你决定什么及为什么>`，并把这条残项带进收尾，让它通过 finishing-a-development-branch 呈现给你的（人类）搭档。
 
-只在修复波之后裁决。为了少跑一次复检而提前裁决，就是换了个名字的预判。每一次裁决都是一条台账记录——静默丢弃是被禁止的。**没有第二轮修复波。**
+只在修复波之后裁决。为了少跑一次复检而提前裁决，就是换了个名字的预判。每一次裁决都是一条台账记录——静默丢弃是被禁止的。**修复波最多三轮；三轮之后不再派发。**
 
-### 5. 完成任务
+### 5. 完成任务与归档台账
 
 当整分支自审干净收尾、修复波已关闭——或残余未决发现都已带裁决处理——向台账追加整份计划的完成行，和你的其他记账放在同一条消息里：
 
-- `Plan: complete (commits <merge-base7>..<head7>, self-review clean)`
-- 裁决后：`Plan: complete (commits <merge-base7>..<head7>, <K> parked, <M> ruled)`
+- `计划: 完成 (提交 <merge-base7>..<head7>, 自审干净)`
+- 裁决后：`计划: 完成 (提交 <merge-base7>..<head7>, <K> 停放, <M> 裁决)`
 
-然后把所有 todo 标记为完成。至此计划执行与整分支自审全部结束，进入下面的"收尾"。
+然后把所有 todo 标记为完成。至此全部任务执行完成、整分支自审与修复波全部结束。
+
+**归档执行台账（所有任务完成后必做）：** 把 `<workspace>/progress.md` 复制到计划文件旁：`<plan 同目录>/<plan-basename>-ledger.md`，并把它提交进分支：
+
+```bash
+cp <workspace>/progress.md <plan-dir>/<plan-basename>-ledger.md
+git add <plan-dir>/<plan-basename>-ledger.md
+git commit -m "docs(sdd): archive <plan-basename> ledger"
+```
+
+台账是裁决、停放发现与实现者顾虑的唯一留存，必须随分支进入 git，而不是随工作区一起消失——工作区在"收尾"里删除，归档的台账才是清理之后仍然可查的记录。
+
+进入下面的"收尾"。
 
 ## 收尾（Finish）
 
-在你删除任何东西之前，把台账里所有含 `Ruling:` 的行收集起来——预检裁决、停放发现、熔断器裁定，全部——按你做出的先后顺序，放进你最后一条消息里"我做出的裁决（Rulings I made）"标题之下，每一条都带上"如果错了代价是什么"。清单必须是穷尽的：只要台账里有一条裁决，清单里就得有它。这份清单是你替（人类）搭档做的决定抵达他们的唯一途径——他们读它，然后返工任何你做错的部分。一条随工作区一起死掉的裁决，就是一次秘密做出的决定。
+在你删除任何东西之前，把台账里所有含 `裁决:` 的行收集起来——预检裁决、停放发现、熔断器裁定，全部——按你做出的先后顺序，放进你最后一条消息里"我做出的裁决（Rulings I made）"标题之下，每一条都带上"如果错了代价是什么"。清单必须是穷尽的：只要台账里有一条裁决，清单里就得有它。这份清单是你替（人类）搭档做的决定抵达他们的唯一途径——他们读它，然后返工任何你做错的部分。一条随工作区一起死掉的裁决，就是一次秘密做出的决定。归档的台账（见 5. 完成任务与归档台账）同样是这份清单的留存。
 
-当整分支自审干净、其修复（若有）已合并后，删除本计划的工作区（`rm -rf <workspace>`）——从此 git 历史就是记录。同级目录属于其他计划；别碰它们。
+当整分支自审干净、其修复（若有）已合并、且台账已归档提交后，删除本计划的工作区（`rm -rf <workspace>`）——从此 git 历史与归档的台账就是记录。同级目录属于其他计划；别碰它们。
 
 使用 superpowers:finishing-a-development-branch。
 
@@ -236,7 +250,7 @@ digraph process {
 | "我自己修吧，派发太折腾" | 控制器亲手修复会污染你的上下文并跳过复检。恢复实现者。 |
 | "每个任务完成都停下来审查一遍更保险" | 中途审查打断执行、烧掉协调上下文，而尚未落定的代码会让结论很快过时；真正的把关在任务全部完成后的一次整分支自审。 |
 | "反正最后有整分支自审，任务里跑过测试就行" | 自审不是实现者偷懒的许可证——它补的是跨任务视角，不替逐任务的测试与提交负责。留到最后的烂摊子只会让修复波更贵。 |
-| "再来一轮修复就会收敛" | 越过修复波之后，轮次不会收敛——失败是结构性的。裁决并分流。 |
+| "再来一轮修复就会收敛" | 修复波最多三轮；三轮之后轮次不会收敛——失败是结构性的。裁决并分流。 |
 | "复检反正又会找到新问题" | 复检只验证修复；它不能跑题。未改动代码上的新发现进台账，不进修复波。 |
 | "这条发现明显是错的，我扔了它" | 你只在裁决时处置发现，而每次处置都是一条台账记录。静默丢弃被禁止。 |
 | "修复很小，跳过复检" | 未经复检的修复就是回归（regression）落地的方式。每一次修复都以一次你自己的限定范围复检收尾。 |
@@ -269,7 +283,7 @@ digraph process {
   - 已提交：d4e5f6a install hook command
   - 顾虑：无
 
-[台账：Task 1: complete (commits a1b2c3d..d4e5f6a, 5/5 passing)]
+[台账：任务 1: 完成 (提交 a1b2c3d..d4e5f6a, 5/5 通过)]
 [todo：任务 1 已完成]
 
 任务 2：恢复模式（Recovery modes）
@@ -283,7 +297,7 @@ digraph process {
   - 已提交：e8f9a0b add verify/repair modes
   - 顾虑：无
 
-[台账：Task 2: complete (commits d4e5f6a..e8f9a0b, 8/8 passing)]
+[台账：任务 2: 完成 (提交 d4e5f6a..e8f9a0b, 8/8 通过)]
 [todo：任务 2 已完成]
 
 ... （任务 3、4 同此模式：实现 → 测试 → 提交 → 汇报 → 记入台账。任务之间不做审查。）
@@ -295,7 +309,7 @@ digraph process {
   任务 2 缺进度报告（规格要求"每 100 项报告一次"）。
   魔法数字（Important）：src/recovery.js:7 硬编码的 100。
 
-[台账：Review: task 2 缺进度报告（spec）— src/recovery.js; 魔法数字（Important）— src/recovery.js:7]
+[台账：审查: 任务 2 缺进度报告（规格）— src/recovery.js; 魔法数字（重要）— src/recovery.js:7]
 
 [修复波：派发一个修复子代理携带全部发现]
 修复者：添加了进度报告，抽出了 PROGRESS_INTERVAL 常量。
@@ -306,11 +320,12 @@ digraph process {
 你：缺进度报告 —— 已解决（ADDRESSED）（src/recovery.js:41）。
   魔法数字 —— 已解决（ADDRESSED）（src/recovery.js:7）。新增破坏：无。
 
-[台账：Review: fix wave (2 addressed, 0 open; commits e8f9a0b..f3e4d5c6)]
-[台账：Plan: complete (commits a1b2c3d..f3e4d5c6, self-review clean)]
+[台账：审查: 修复波 (1/3, 2 已解决, 0 未决; 提交 e8f9a0b..f3e4d5c6)]
+[台账：计划: 完成 (提交 a1b2c3d..f3e4d5c6, 自审干净)]
+[归档台账：cp 到 docs/superpowers/plans/feature-plan-ledger.md 并提交]
 
-[把台账里的 Ruling 行整理成"我做出的裁决（Rulings I made）"列给搭档]
-[删除本计划的工作区 —— 记录从此活在 git 里]
+[把台账里的"裁决:"行整理成"我做出的裁决（Rulings I made）"列给搭档]
+[删除本计划的工作区 —— 记录从此活在 git 与归档台账里]
 
 完成！使用 superpowers:finishing-a-development-branch。
 ```

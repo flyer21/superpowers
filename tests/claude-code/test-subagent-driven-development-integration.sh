@@ -27,7 +27,7 @@ echo "  2. Task text provided via task briefs (implementers don't read the whole
 echo "  3. No per-task self-review: implement -> test -> commit -> report"
 echo "  4. Controller runs ONE whole-branch self-review after all tasks"
 echo "  5. Self-review covers spec compliance and code quality, reading the code"
-echo "  6. Findings go to a single fix wave the controller re-checks (no second wave)"
+echo "  6. Findings go to fix waves (up to three rounds) the controller re-checks"
 echo ""
 echo "WARNING: This test may take 10-30 minutes to complete."
 echo ""
@@ -139,7 +139,7 @@ IMPORTANT: Follow the skill exactly. I will be verifying that you:
 2. Provide task text via task brief files (implementers must not read the whole plan)
 3. Do NOT require implementers to self-review before reporting - the loop is implement, test, commit, report
 4. After all tasks complete, run ONE whole-branch self-review covering spec compliance and code quality, reading the actual diff
-5. Handle findings in a single fix wave that you re-check yourself - no second fix wave
+5. Handle findings in fix waves (up to three rounds) that you re-check yourself
 
 Begin now. Execute the plan.
 EOF
@@ -153,7 +153,7 @@ IMPORTANT: Follow the skill exactly. I will be verifying that you:
 2. Provide task text via task brief files (implementers must not read the whole plan)
 3. Do NOT require implementers to self-review before reporting - the loop is implement, test, commit, report
 4. After all tasks complete, run ONE whole-branch self-review covering spec compliance and code quality, reading the actual diff
-5. Handle findings in a single fix wave that you re-check yourself - no second fix wave
+5. Handle findings in fix waves (up to three rounds) that you re-check yourself
 
 Begin now. Execute the plan."
 

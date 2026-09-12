@@ -89,7 +89,7 @@ Tests skill content and requirements (~2 minutes):
 - No per-task self-review (single whole-branch self-review after all tasks)
 - Plan reading efficiency documented (read once up front, not per task)
 - Self-review verifies the code, not the report
-- Single fix wave documented (controller re-checks; no second wave)
+- Fix waves documented (up to three rounds; controller re-checks each)
 - Task context provision via task brief files documented
 
 ### Integration Tests (use --integration flag)
