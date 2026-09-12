@@ -1,5 +1,12 @@
 # Superpowers Release Notes
 
+## v6.3.3 (2026-09-12)
+
+### Subagent-Driven Development & Executing Plans
+
+- **Plan checkboxes are now ticked when a task completes.** Both execution skills booked completion in their own bookkeeping — the SDD ledger, the controller's todo list — and left the plan file's `- [ ]` steps unticked for the rest of the run, so your only progress view stayed empty while the ledger said `完成`. The no-skill control scores 0/5, so the plan header's own checkbox promise is inert without the instruction; eval: SDD 0/5 → 5/5 (p = 0.004), `executing-plans` 6/16 → 12/12 (p = 0.0006). The `executing-plans` baseline is stochastic rather than stably broken — both numbers are in the results doc.
+- Eval results and the harness: `docs/superpowers/specs/2026-09-12-plan-checkbox-tracking-eval-results.md`, `tests/claude-code/test-plan-checkbox-tracking.sh`.
+
 ## v6.3.1 (2026-08-12)
 
 ### Harness Support
