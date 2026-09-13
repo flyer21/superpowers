@@ -3,39 +3,116 @@
 # implementer reads in one call, so the task text never has to be pasted
 # through the controller's context.
 #
-# Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
-# Default OUTFILE: <repo-root>/.superpowers/sdd/<plan-basename>/task-<N>-brief.md
+# Usage: task-brief PLAN_FILE TASK_ID [OUTFILE]
+# TASK_ID is the task's identifier as its heading spells it — a plain number
+# (`1`), a sub-number (`1.1`), a phase-scoped number (`C1-1`), a letter-number
+# id (`A1`) — or just the trailing number of a phase-scoped id, so `2` also
+# finds `### 任务 C1-2：`. A heading matches when, after an optional
+# `Task`/`任务` label, it opens with that identifier: `### 任务 C1-1：…` and
+# `### C1-1 — …` both resolve. A labeled heading beats a bare heading and an
+# exact id beats a trailing-number match, so a plan that numbers its own
+# sections (`## 1. Overview`) cannot shadow its tasks. A trailing number that
+# fits two phases (`### 任务 C1-2：` and `### 任务 C2-2：`) is an error, not a
+# guess. The brief runs from that heading to the next task heading or phase
+# heading (`阶段 …`/`Phase …`) outside fenced code.
+# Default OUTFILE: <repo-root>/.superpowers/sdd/<plan-basename>/task-<TASK_ID>-brief.md
 # (per plan and per worktree; concurrent runs of the SAME plan in the same
 # working tree share it).
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]" >&2
+  echo "usage: task-brief PLAN_FILE TASK_ID [OUTFILE]" >&2
   exit 2
 fi
 
 plan=$1
-n=$2
+id=$2
 [ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
+case $id in
+  '' | */*) echo "bad task id: '${id}' (expected a heading id such as 1, 1.1, C1-1)" >&2; exit 2 ;;
+esac
 
 if [ $# -eq 3 ]; then
   out=$3
 else
   dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace" "$plan")
-  out="$dir/task-${n}-brief.md"
+  out="$dir/task-${id}-brief.md"
 fi
 
-awk -v n="$n" '
-  /^```/ { infence = !infence }
-  !infence && /^#+[ \t]+(Task|任务)[ \t]+[0-9]+/ {
-    intask = ($0 ~ ("^#+[ \t]+(Task|任务)[ \t]+" n "([^0-9]|$)"))
+awk -v plan="$plan" -v want="$id" '
+  # Task id of a heading ("" when the heading is not a task heading).
+  # `had_label` records whether the id carried a Task/任务 label.
+  function task_id(heading,    t) {
+    t = heading
+    sub(/^#+[ \t]+/, "", t)
+    had_label = 0
+    if (match(t, /^(Task|任务)[ \t]+/)) {
+      had_label = 1
+      t = substr(t, RLENGTH + 1)
+    }
+    if (match(t, /^[A-Za-z]*[0-9]+[A-Za-z]*([._-][0-9A-Za-z]+)*/)) return substr(t, 1, RLENGTH)
+    return ""
   }
-  intask { print }
+  # A phase heading (`## 阶段 C1`) opens a group of tasks: always an end of the
+  # brief, never part of the task above it.
+  function is_phase(heading,    t) {
+    t = heading
+    sub(/^#+[ \t]+/, "", t)
+    return (t ~ /^(阶段|Phase)([ \t:：]|$)/)
+  }
+  function id_matches(h, allow_tail,    lh) {
+    lh = tolower(h)
+    if (lh == tolower(want)) return 1
+    return (allow_tail == 1 && want ~ /^[0-9]+$/ && lh ~ ("[-.]" tolower(want) "$"))
+  }
+  {
+    text[NR] = $0
+    if ($0 ~ /^```/) infence = !infence
+    if (!infence && $0 ~ /^#+[ \t]/) {
+      nhead++
+      hline[nhead] = NR
+      hid[nhead] = task_id($0)
+      hlab[nhead] = had_label
+      hph[nhead] = is_phase($0)
+    }
+  }
+  END {
+    for (i = 1; i <= nhead; i++) {
+      if (hid[i] == "" || (tolower(hid[i]) in seen)) continue
+      seen[tolower(hid[i])] = 1
+      known = known (known == "" ? "" : ", ") hid[i]
+    }
+    # Most specific heading wins: exact labeled id, labeled trailing number,
+    # bare exact id, bare trailing number.
+    for (tier = 1; tier <= 4 && pick == 0 && !ambiguous; tier++) {
+      count = 0
+      cand = ""
+      for (i = 1; i <= nhead; i++) {
+        if (hid[i] == "" || (tier <= 2 && hlab[i] != 1)) continue
+        if (!id_matches(hid[i], (tier == 2 || tier == 4))) continue
+        count++
+        if (count == 1) pick = i
+        cand = cand (cand == "" ? "" : ", ") hid[i] " (line " hline[i] ")"
+      }
+      # Two headings can legitimately spell the same id (a sub-heading that
+      # repeats its task number): the first one is the task. Two headings that
+      # merely end in the same number are two different tasks.
+      if (count > 1 && (tier == 2 || tier == 4)) { ambiguous = 1; pick = 0 }
+    }
+    if (ambiguous) {
+      printf "task id %s is ambiguous in %s: %s — name the task by its full id\n", want, plan, cand > "/dev/stderr"
+      exit 3
+    }
+    if (pick == 0) {
+      printf "task %s not found in %s (task ids in the plan: %s)\n", want, plan, (known == "" ? "none" : known) > "/dev/stderr"
+      exit 3
+    }
+    last = NR
+    for (i = pick + 1; i <= nhead; i++) {
+      if (hid[i] != "" || hph[i]) { last = hline[i] - 1; break }
+    }
+    for (l = hline[pick]; l <= last; l++) print text[l]
+  }
 ' "$plan" > "$out"
-
-if [ ! -s "$out" ]; then
-  echo "task ${n} not found in ${plan} (no heading matching 'Task ${n}' or '任务 ${n}')" >&2
-  exit 3
-fi
 
 echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines"

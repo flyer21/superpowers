@@ -165,7 +165,7 @@ Subagent (general-purpose):
 
 **占位符（Placeholders）：**
 - `[MODEL]` — 必填：按 SKILL.md"模型选择"选定的审查模型
-- `[BRIEF_FILE]` — 必填：任务简报文件（`scripts/task-brief PLAN N` 会打印该
+- `[BRIEF_FILE]` — 必填：任务简报文件（`scripts/task-brief PLAN_FILE TASK_ID` 会打印该
   路径；与实现者所用的是同一个文件）
 - `[GLOBAL_CONSTRAINTS]` — 从计划的"全局约束"小节或规格中原样复制的有约束
   力需求：精确的取值、格式、以及组件间陈述出来的关系（不包括流程规则——

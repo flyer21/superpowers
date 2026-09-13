@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Tests for the SDD workspace: scripts/sdd-workspace resolves a self-ignoring,
 # PER-PLAN working-tree directory for SDD artifacts, and the SDD scripts write
-# into their plan's directory.
+# into their plan's directory. The task-brief cases also cover the task-heading
+# shapes it accepts: labeled, bare, and phase-scoped ids.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -127,6 +128,151 @@ PLAN
     else
         fail "task-brief writes its brief under the plan's workspace"
         echo "    got: $brief_path"
+    fi
+
+    # --- task-brief resolves the plan's own task-id shapes ---
+    cat > "$repo/plan-ids.md" <<'PLAN'
+# Plan with phases
+
+## 1. Background
+
+Not a task.
+
+## 阶段 C1：生命周期
+
+### 任务 C1-1：空闲超时
+
+改 server.cjs 的空闲超时。
+
+```bash
+### 任务 C1-9：围栏里的假标题
+```
+
+### C1-2 — 服务端死亡可见
+
+加一个墓碑页。
+
+## 阶段 C2：其他
+
+### 任务 C2-1：别的
+
+不相干的内容。
+PLAN
+
+    local ids_path ids_text
+    local ids_out
+    ids_out="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-ids.md C1-2)"
+    ids_path="$(printf '%s\n' "$ids_out" | sed -n 's/^wrote \(.*\): [0-9][0-9]* lines$/\1/p')"
+    if [[ "$ids_path" == "$repo/.superpowers/sdd/plan-ids/task-C1-2-brief.md" ]]; then
+        pass "task-brief takes a phase-scoped task id and names the brief after it"
+    else
+        fail "task-brief takes a phase-scoped task id and names the brief after it"
+        echo "    got: $ids_path"
+    fi
+
+    ids_text="$(cat "$repo/.superpowers/sdd/plan-ids/task-C1-2-brief.md")"
+    if [[ "$ids_text" == *"墓碑"* && "$ids_text" != *"C2-1"* ]]; then
+        pass "a bare-id brief stops at the next phase heading"
+    else
+        fail "a bare-id brief stops at the next phase heading"
+        echo "    brief: $ids_text"
+    fi
+
+    (cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-ids.md C1-1 >/dev/null)
+    ids_text="$(cat "$repo/.superpowers/sdd/plan-ids/task-C1-1-brief.md")"
+    if [[ "$ids_text" == *"空闲超时"* && "$ids_text" == *"围栏里的假标题"* && "$ids_text" != *"墓碑"* ]]; then
+        pass "a labeled phase-scoped brief keeps fenced lines and stops at the next task heading"
+    else
+        fail "a labeled phase-scoped brief keeps fenced lines and stops at the next task heading"
+        echo "    brief: $ids_text"
+    fi
+
+    cat > "$repo/plan-num.md" <<'PLAN'
+# Plan that numbers its own sections
+
+## 1. Overview
+
+Not a task.
+
+### 任务 1：真正的任务
+
+任务正文。
+PLAN
+    (cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-num.md 1 >/dev/null)
+    ids_text="$(cat "$repo/.superpowers/sdd/plan-num/task-1-brief.md")"
+    if [[ "$ids_text" == *"真正的任务"* && "$ids_text" != *"Overview"* ]]; then
+        pass "a labeled heading wins over a same-numbered section heading"
+    else
+        fail "a labeled heading wins over a same-numbered section heading"
+        echo "    brief: $ids_text"
+    fi
+
+    # A controller that only knows the task's ordinal still reaches a
+    # phase-scoped id: `task-brief PLAN 2` resolves `### C1-2 — …`.
+    ids_out="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-ids.md 2)"
+    ids_path="$(printf '%s\n' "$ids_out" | sed -n 's/^wrote \(.*\): [0-9][0-9]* lines$/\1/p')"
+    ids_text="$(cat "$repo/.superpowers/sdd/plan-ids/task-2-brief.md" 2>/dev/null || true)"
+    if [[ "$ids_path" == "$repo/.superpowers/sdd/plan-ids/task-2-brief.md" && "$ids_text" == *"墓碑"* ]]; then
+        pass "a trailing task number reaches a phase-scoped id"
+    else
+        fail "a trailing task number reaches a phase-scoped id"
+        echo "    got: $ids_path"
+        echo "    brief: $ids_text"
+    fi
+
+    cat > "$repo/plan-phases.md" <<'PLAN'
+# Two phases, same tail number
+
+### 任务 C1-2：第一个阶段的任务 2
+
+甲。
+
+### 任务 C2-2：第二个阶段的任务 2
+
+乙。
+PLAN
+    local amb_rc=0 amb_err
+    amb_err="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-phases.md 2 2>&1 >/dev/null)" || amb_rc=$?
+    if [[ "$amb_rc" -eq 3 && "$amb_err" == *"C1-2"* && "$amb_err" == *"C2-2"* ]]; then
+        pass "a tail number that fits two phases fails instead of guessing"
+    else
+        fail "a tail number that fits two phases fails instead of guessing"
+        echo "    exit: $amb_rc"
+        echo "    stderr: $amb_err"
+    fi
+
+    cat > "$repo/plan-steps.md" <<'PLAN'
+# Task with a sub-headed step
+
+## Task 1: First thing
+
+Body.
+
+### Step 1: do it
+
+Step body.
+
+## Task 2: Second thing
+
+Other.
+PLAN
+    (cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-steps.md 1 >/dev/null)
+    ids_text="$(cat "$repo/.superpowers/sdd/plan-steps/task-1-brief.md")"
+    if [[ "$ids_text" == *"Step body"* && "$ids_text" != *"Other"* ]]; then
+        pass "a step sub-heading stays inside its task's brief"
+    else
+        fail "a step sub-heading stays inside its task's brief"
+        echo "    brief: $ids_text"
+    fi
+
+    local unknown_rc=0 unknown_err
+    unknown_err="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-ids.md Z9 2>&1 >/dev/null)" || unknown_rc=$?
+    if [[ "$unknown_rc" -eq 3 && "$unknown_err" == *"C1-1"* ]]; then
+        pass "an unknown task id fails with exit 3 and lists the plan's task ids"
+    else
+        fail "an unknown task id fails with exit 3 and lists the plan's task ids"
+        echo "    exit: $unknown_rc"
+        echo "    stderr: $unknown_err"
     fi
 
     # --- review-package takes the plan first and lands in its directory ---
