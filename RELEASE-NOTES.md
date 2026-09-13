@@ -1,5 +1,14 @@
 # Superpowers Release Notes
 
+## v6.3.6 (2026-09-13)
+
+### Test-Driven Development
+
+- **The RED step no longer means "run the test and watch it fail."** Step 1 now writes the test complete and does not run it; the first run happens in step 3, where the new test and the existing suite run together. Writing the test before the implementation is what defines this sequence — the premature run only re-confirmed an order the workflow already guaranteed, at the cost of an extra cycle on every task. Step 3 owns failure triage: missing implementation → fix the implementation, wrong test → fix the test, never loosen an assertion to fit the code. Propagated to `writing-plans`, `systematic-debugging` (a fix still starts with a test, written and not run), `verification-before-completion` (regression-test evidence is write order plus a revert check, not a red-green log), `writing-good-tests`, and the SDD implementer and task-reviewer prompts — the reviewer no longer counts a missing "failed before implementation" run as a gap, since write order is not verifiable from a diff.
+- `writing-plans`: the granularity section is now 合适小任务的粒度 (was 一口大小的任务粒度), and its step-1 wording matches the loop above.
+- The plan-checkbox integration test's fixture plans carry the new step-1 wording.
+- README's workflow summary is synced: `bite-sized tasks (2-5 minutes each)` → `right-sized tasks (a lean 4-step cycle, roughly 20-50 minutes each)`.
+
 ## v6.3.5 (2026-09-13)
 
 ### Subagent-Driven Development
