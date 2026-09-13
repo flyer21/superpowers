@@ -1,10 +1,10 @@
 # Superpowers Release Notes
 
-## v6.3.4 (2026-09-12)
+## v6.3.5 (2026-09-13)
 
 ### Subagent-Driven Development
 
-- **Task briefs are archived with the ledger.** SDD's durable record was the ledger alone, so the per-task `task-<N>-brief.md` files — the only remaining copy of each task's exact requirements (numbers, magic strings, signatures, test cases) — were deleted with the workspace. The archive step now copies the ledger and every task brief into `docs/superpowers/archive/` (`<plan-basename>-ledger.md`, `<plan-basename>-task-<N>-brief.md`) and commits them with the plan file.
+- **Task briefs are archived with the ledger, one directory per plan.** SDD's durable record was the ledger alone, so the per-task `task-<N>-brief.md` files — the only remaining copy of each task's exact requirements (numbers, magic strings, signatures, test cases) — were deleted with the workspace. The archive step now copies the ledger and every task brief into a directory for that plan, beside the plan directory: `ARCHIVE_DIR="$(dirname "$PLAN_FILE")/../archive"`, so a plan in `docs/superpowers/plans/` archives to `docs/superpowers/archive/<plan-basename>/` as `ledger.md` and `task-<N>-brief.md`, committed together with the plan file. The archive root follows the plan path instead of being hardcoded, and the per-plan directory carries the separation that filename prefixes used to.
 
 ## v6.3.3 (2026-09-12)
 
