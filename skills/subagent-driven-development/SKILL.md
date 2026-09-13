@@ -222,16 +222,19 @@ digraph process {
 
 然后把所有 todo 标记为完成。至此全部任务执行完成、整分支自审与修复波全部结束。
 
-**归档执行记录（所有任务完成后必做）：** 归档目录固定为 `docs/superpowers/archive/`（不存在则先创建）。把 `<workspace>/progress.md` 复制过去为 `docs/superpowers/archive/<plan-basename>-ledger.md`；工作区里每份任务简报 `<workspace>/task-<ID>-brief.md` 也一并归档为 `docs/superpowers/archive/<plan-basename>-task-<ID>-brief.md`。然后把这些文件、连同你逐任务勾选了复选框的计划文件一起提交进分支（计划文件里的勾选只随这次提交落盘）：
+**归档执行记录（所有任务完成后必做）：** 归档根用变量 `ARCHIVE_DIR` 定一次，取法与计划路径同源——计划文件在哪儿，归档根就在它所在目录的兄弟位置（计划在 `docs/superpowers/plans/`，归档根就是 `docs/superpowers/archive/`）。每份计划在归档根下独占一个以计划文件名（去掉 `.md`）命名的目录：台账存为 `$ARCHIVE_DIR/<plan-basename>/ledger.md`，工作区里每份任务简报 `<workspace>/task-<ID>-brief.md` 存为 `$ARCHIVE_DIR/<plan-basename>/task-<ID>-brief.md`。目录名本身就把这份计划与同根下的其他计划隔开，所以文件名不必再带计划名前缀。然后把这些文件、连同你逐任务勾选了复选框的计划文件一起提交进分支（计划文件里的勾选只随这次提交落盘）：
 
 ```bash
-mkdir -p docs/superpowers/archive
-cp <workspace>/progress.md docs/superpowers/archive/<plan-basename>-ledger.md
+PLAN_FILE=docs/superpowers/plans/<plan-basename>.md       # 本计划的路径
+ARCHIVE_DIR="$(dirname "$PLAN_FILE")/../archive"          # 归档根：计划目录的兄弟目录
+slug="$(basename "$PLAN_FILE" .md)"
+mkdir -p "$ARCHIVE_DIR/$slug"
+cp <workspace>/progress.md "$ARCHIVE_DIR/$slug/ledger.md"
 for brief in <workspace>/task-*-brief.md; do
-  cp "$brief" "docs/superpowers/archive/<plan-basename>-$(basename "$brief")"
+  cp "$brief" "$ARCHIVE_DIR/$slug/$(basename "$brief")"
 done
-git add docs/superpowers/archive/<plan-basename>-ledger.md docs/superpowers/archive/<plan-basename>-task-*-brief.md <archive-file>
-git commit -m "docs(sdd): archive <plan-basename> ledger and briefs"
+git add "$ARCHIVE_DIR/$slug" "$PLAN_FILE"
+git commit -m "docs(sdd): archive $slug ledger and briefs"
 ```
 
 台账是裁决、停放发现与实现者顾虑的唯一留存；任务简报是每个任务精确需求（数字、魔法字符串、签名、测试用例）的唯一留存。两者都必须随分支进入 git，而不是随工作区一起消失——工作区在"收尾"里删除，归档的记录才是清理之后仍然可查的依据。
@@ -328,7 +331,7 @@ git commit -m "docs(sdd): archive <plan-basename> ledger and briefs"
 
 [台账：审查: 修复波 (1/3, 2 已解决, 0 未决; 提交 e8f9a0b..f3e4d5c6)]
 [台账：计划: 完成 (提交 a1b2c3d..f3e4d5c6, 自审干净)]
-[归档记录：cp 台账与任务简报到 docs/superpowers/archive/ 并提交]
+[归档记录：cp 台账与任务简报进 docs/superpowers/archive/feature-plan/ 并提交]
 
 [把台账里的"裁决:"行整理成"我做出的裁决（Rulings I made）"列给搭档]
 [删除本计划的工作区 —— 记录从此活在 git 与归档记录里]
