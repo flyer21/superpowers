@@ -20,5 +20,10 @@ check "brainstorming：路线图路径" grep -q "docs/superpowers/roadmaps/YYYY-
 check "brainstorming：后续阶段回读" grep -q "必须先回读路线图" skills/brainstorming/SKILL.md
 check "brainstorming：自审范围检查" grep -q "整条路线图出现在一份规格" skills/brainstorming/SKILL.md
 
+# 任务 3（writing-plans）：两种拆分 + 计划头部路线图字段
+check "writing-plans：每阶段一份计划" grep -q "每个阶段一份计划" skills/writing-plans/SKILL.md
+check "writing-plans：计划头部路线图字段" grep -q '路线图（Roadmap）：' skills/writing-plans/SKILL.md
+check "writing-plans：不横跨阶段" grep -q "绝不允许一份计划横跨多个阶段" skills/writing-plans/SKILL.md
+
 [ "$fail" -eq 0 ] && echo "ALL CHECKS PASS" || echo "CHECKS FAILED"
 exit "$fail"
