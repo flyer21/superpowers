@@ -1,5 +1,12 @@
 # Superpowers Release Notes
 
+## v6.3.7 (2026-09-19)
+
+### Test-Driven Development
+
+- **`writing-good-code.md` is no longer a dead link.** The reference file the skill's step 2 has pointed to since the loop was written existed only as an empty file, and the skill's own "Good Code" section was a headerless stub — a table with a header row and nothing else. Both now carry real content: the reference is organized around minimality (GREEN writes exactly what the current test asserts, literal values are legal GREEN until a second test demands generality) and simple design (abstractions are paid for by duplication; every refactor step returns to step 3 and stays green), and the skill's Good Code section mirrors the Good Tests section — a three-row table plus the four rules that keep code within the bounds its tests drew. Localized to Chinese to match the rest of the skill.
+- Added to the rationalizations table: "let me optimize this while I'm here" — performance work without a benchmark test is the same untested production code the Iron Law forbids.
+
 ## v6.3.6 (2026-09-13)
 
 ### Test-Driven Development
