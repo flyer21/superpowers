@@ -40,5 +40,8 @@ check "一致性：5 个技能都提到路线图" bash -c 'for f in skills/brain
 check "一致性：术语不漂移（无 Phase 大写混用为中文语境主词）" bash -c '! grep -rn "多阶段 Phase" skills/'
 check "一致性：前后端描述同一交接契约" bash -c 'grep -q "路线图检测以此为准" skills/executing-plans/SKILL.md && grep -q "路线图检测以此为准" skills/subagent-driven-development/SKILL.md && grep -q "路线图检测（Roadmap Check）" skills/finishing-a-development-branch/SKILL.md'
 
+# 补充（规格 §5 收口）：路线图全部完成时的归档建议
+check "finishing：全部完成时建议归档" grep -q "并建议你的（人类）搭档归档路线图" skills/finishing-a-development-branch/SKILL.md
+
 [ "$fail" -eq 0 ] && echo "ALL CHECKS PASS" || echo "CHECKS FAILED"
 exit "$fail"
