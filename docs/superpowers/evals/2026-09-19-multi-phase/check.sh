@@ -13,10 +13,12 @@ check() { # check <名称> <命令...>
   fi
 }
 
-# 任务 1（基线）：改动前，5 个技能都没有“顺序阶段”支持——这些是记录基线用的反向断言
-check "基线：brainstorming 无顺序阶段指引" bash -c '! grep -q "顺序阶段" skills/brainstorming/SKILL.md'
-check "基线：writing-plans 无路线图字段" bash -c '! grep -q "路线图（Roadmap）" skills/writing-plans/SKILL.md'
-check "基线：finishing 无路线图检测" bash -c '! grep -q "路线图检测" skills/finishing-a-development-branch/SKILL.md'
+# 任务 2（brainstorming）：顺序阶段 + 路线图
+check "brainstorming：两种分解" grep -q "后期阶段的设计依赖前期阶段" skills/brainstorming/SKILL.md
+check "brainstorming：路线图小节" grep -q "多阶段路线图（Multi-phase roadmaps）" skills/brainstorming/SKILL.md
+check "brainstorming：路线图路径" grep -q "docs/superpowers/roadmaps/YYYY-MM-DD-<topic>-roadmap.md" skills/brainstorming/SKILL.md
+check "brainstorming：后续阶段回读" grep -q "必须先回读路线图" skills/brainstorming/SKILL.md
+check "brainstorming：自审范围检查" grep -q "整条路线图出现在一份规格" skills/brainstorming/SKILL.md
 
 [ "$fail" -eq 0 ] && echo "ALL CHECKS PASS" || echo "CHECKS FAILED"
 exit "$fail"
