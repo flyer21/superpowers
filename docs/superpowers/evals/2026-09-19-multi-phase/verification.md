@@ -54,6 +54,14 @@ ALL CHECKS PASS
 - 对抗性场景："我直接把阶段 2 一起设计了"应被 brainstorming 的阶段聚焦指引拒绝
 - 完成前不得删除本节——这是显式记录的评估债务，不是待清理的杂物
 
+**当前状态（2026-09-19 补充）：** 场景 A/B/C 已按上游格式写为本机 `evals/scenarios/roadmap-sequential-phases-produces-roadmap`、`roadmap-phase-closure-prompts-next-phase`、`roadmap-single-phase-no-regression`（该目录被 gitignore，不入库）；`bun run quorum check` 静态校验 3/3 ok，且判别力已离线验证（未改动的 fixture 上 post 检查失败、模拟合规结局后通过）。**唯一阻塞是缺少真实 Anthropic 凭证**——本机只有 DeepSeek 的 base URL 与 token，既不能驱动被测 claude，也会把判定模型误路由到 DeepSeek，因此**尚未运行任何付费会话**。harness 现名 quorum（"drill" 是旧名，Bun/TS）；对抗性场景（"我直接把阶段 2 一起设计了"）尚未写成场景定义。跑法（每场景一个 tmux 会话，估算 3-15 分钟/场景）：
+
+    unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN
+    export ANTHROPIC_API_KEY=<真 key>   # 或 claude setup-token 后 export CLAUDE_CODE_OAUTH_TOKEN
+    export SUPERPOWERS_ROOT=<本仓库根> PATH="$HOME/.bun/bin:$PATH"
+    cd evals && bun run quorum check roadmap-sequential-phases-produces-roadmap
+    bun run quorum run scenarios/roadmap-sequential-phases-produces-roadmap --coding-agent claude --credential sonnet5
+
 ## 基础设施测试说明
 
 仓库 package.json 无 test 脚本；tests/ 下的测试均为 harness 专用
