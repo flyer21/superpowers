@@ -23,6 +23,7 @@ PASS: finishing：无路线图零变化
 PASS: 一致性：5 个技能都提到路线图
 PASS: 一致性：术语不漂移（无 Phase 大写混用为中文语境主词）
 PASS: 一致性：前后端描述同一交接契约
+PASS: finishing：全部完成时建议归档
 ALL CHECKS PASS
 
 ## 逐项对照规格
@@ -31,18 +32,18 @@ ALL CHECKS PASS
 - 规格第 2 节（brainstorming）：两种分解 / 路线图流程 / 后续阶段回读 / 自审加条 → 任务 2 编辑 2a-2c
 - 规格第 3 节（writing-plans）：两种拆分 / 头部字段 → 任务 3 编辑 3a-3b
 - 规格第 4 节（执行技能交接）：→ 任务 4 编辑 4a-4b
-- 规格第 5 节（finishing 第 7 步）：零变化原则 / 基分支状态更新 / 下一阶段提示 → 任务 5 编辑 5a-5b
+- 规格第 5 节（finishing 第 7 步）：零变化原则 / 基分支状态更新 / 下一阶段提示 → 任务 5 编辑 5a-5b；全部完成时建议归档 → 本次补充
 - 规格第 6 节（改动清单）：5 个技能、小节级改动、无新脚本无新依赖 → 由整分支自审核实
 
 ## 令牌效率
 
 对每个改动文件运行 `wc -w`，记录增量（brainstorming 与 subagent-driven-development 是大文件，增量应控制在净新增 400 词以内/文件）：
 
-- skills/brainstorming/SKILL.md: 650 词
-- skills/writing-plans/SKILL.md: 265 词
-- skills/executing-plans/SKILL.md: 139 词
-- skills/subagent-driven-development/SKILL.md: 1161 词
-- skills/finishing-a-development-branch/SKILL.md: 568 词
+- skills/brainstorming/SKILL.md: 650 词（净新增 +42）
+- skills/writing-plans/SKILL.md: 265 词（净新增 +4）
+- skills/executing-plans/SKILL.md: 139 词（净新增 +3）
+- skills/subagent-driven-development/SKILL.md: 1161 词（净新增 +1）
+- skills/finishing-a-development-branch/SKILL.md: 568 词（净新增 +39）
 
 ## 后续工作（drill eval 债务）
 
@@ -60,4 +61,11 @@ ALL CHECKS PASS
 skills/*.md 与 docs/，`git diff --stat` 应确认分支上没有任何
 hooks/、scripts/、tests/ 文件改动——以此代替"跑基础设施测试"，
 风险由整分支自审核实。
+
 注意：`docs/superpowers/evals/` 路径会被 `.gitignore` 中无锚点的 `evals/` 规则匹配，新增的未追踪文件（如本记录）必须用 `git add -f` 提交——照抄计划中的 `git add docs/...` 命令会因 "paths are ignored" 失败。
+
+## 补充修订（2026-09-19，分支 multi-phase-followups）
+
+- 令牌效率：按搭档要求改为记录净新增词数（此前只记绝对值）。
+- 规格第 5 节"建议归档"一句原先未落地，已在 finishing 第 7 步补齐（新增 1 条断言，见上）。
+- 上述"注意"行的空行为格式修正。
