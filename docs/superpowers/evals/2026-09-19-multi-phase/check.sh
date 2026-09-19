@@ -29,5 +29,11 @@ check "writing-plans：不横跨阶段" grep -q "绝不允许一份计划横跨�
 check "executing-plans：交接传递路线图" grep -q "finishing 的路线图检测以此为准" skills/executing-plans/SKILL.md
 check "subagent-driven-development：交接传递路线图" grep -q "finishing 的路线图检测以此为准" skills/subagent-driven-development/SKILL.md
 
+# 任务 5（finishing）：第 7 步路线图检测
+check "finishing：路线图检测小节" grep -q "路线图检测（Roadmap Check）" skills/finishing-a-development-branch/SKILL.md
+check "finishing：状态更新在基分支" grep -q "在基分支上把本阶段标记为" skills/finishing-a-development-branch/SKILL.md
+check "finishing：下一阶段提示" grep -q "要现在开始它的头脑风暴吗" skills/finishing-a-development-branch/SKILL.md
+check "finishing：无路线图零变化" grep -q "没有路线图信息时" skills/finishing-a-development-branch/SKILL.md
+
 [ "$fail" -eq 0 ] && echo "ALL CHECKS PASS" || echo "CHECKS FAILED"
 exit "$fail"
