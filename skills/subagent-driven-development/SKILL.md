@@ -247,7 +247,7 @@ git commit -m "docs(sdd): archive $slug ledger and briefs"
 
 当整分支自审干净、其修复（若有）已合并、且记录已归档提交后，删除本计划的工作区（`rm -rf <workspace>`）——从此 git 历史与归档的记录就是依据。同级目录属于其他计划；别碰它们。
 
-使用 superpowers:finishing-a-development-branch。
+使用 superpowers:finishing-a-development-branch。计划头部声明了路线图（Roadmap）字段时，转入时带上路线图路径与阶段号——finishing 的路线图检测以此为准。
 
 ## 常见合理化借口（Common Rationalizations）
 

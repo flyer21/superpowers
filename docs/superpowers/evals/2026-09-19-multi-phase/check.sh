@@ -25,5 +25,9 @@ check "writing-plans：每阶段一份计划" grep -q "每个阶段一份计划"
 check "writing-plans：计划头部路线图字段" grep -q '路线图（Roadmap）：' skills/writing-plans/SKILL.md
 check "writing-plans：不横跨阶段" grep -q "绝不允许一份计划横跨多个阶段" skills/writing-plans/SKILL.md
 
+# 任务 4（执行技能）：向收尾传递阶段上下文
+check "executing-plans：交接传递路线图" grep -q "finishing 的路线图检测以此为准" skills/executing-plans/SKILL.md
+check "subagent-driven-development：交接传递路线图" grep -q "finishing 的路线图检测以此为准" skills/subagent-driven-development/SKILL.md
+
 [ "$fail" -eq 0 ] && echo "ALL CHECKS PASS" || echo "CHECKS FAILED"
 exit "$fail"

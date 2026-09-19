@@ -34,7 +34,7 @@ description: 当你有一份已写好的实施计划、需要在带审查检查�
 ### 第 3 步：完成开发（Complete Development）
 
 在所有任务完成并通过验证之后：
-- 宣布："我正在用 finishing-a-development-branch 技能来完成这份工作。"
+- 宣布："我正在用 finishing-a-development-branch 技能来完成这份工作。"如果计划头部声明了路线图（Roadmap）字段，宣布时带上"（路线图 <路径>，阶段 N：<名称>）"——finishing 的路线图检测以此为准
 - **必需的子技能：** 使用 superpowers:finishing-a-development-branch
 - 遵循该技能去验证测试、给出选项、执行选择
 
