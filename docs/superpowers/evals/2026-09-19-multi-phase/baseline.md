@@ -5,12 +5,12 @@
 
 ## 基线证据（静态分析，非 LLM 实测）
 
-以下断言在改动前全部成立（见 check.sh 的“基线”反向断言与运行记录）：
+以下断言在改动前全部成立（见 check.sh 的"基线"反向断言与运行记录）：
 
-1. `skills/brainstorming/SKILL.md` 的范围评估只覆盖“相互独立的子系统”分解，
-   没有“顺序阶段”概念——一个顺序阶段型大目标会被误拆为独立子项目，或塞进一份规格。
+1. `skills/brainstorming/SKILL.md` 的范围评估只覆盖"相互独立的子系统"分解，
+   没有"顺序阶段"概念——一个顺序阶段型大目标会被误拆为独立子项目，或塞进一份规格。
 2. `skills/writing-plans/SKILL.md` 的范围检查与计划头部都没有路线图/阶段概念，
-   无法区分“独立子系统拆多计划”与“顺序阶段每阶段一计划”。
+   无法区分"独立子系统拆多计划"与"顺序阶段每阶段一计划"。
 3. `skills/executing-plans/SKILL.md`、`skills/subagent-driven-development/SKILL.md`
    进入收尾时不传递任何阶段上下文。
 4. `skills/finishing-a-development-branch/SKILL.md` 收尾后直接结束，
