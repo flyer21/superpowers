@@ -33,7 +33,7 @@
 - 消费（Consumes）：无
 - 产出（Produces）：可执行的 `check.sh`（后续任务 2-5 各追加一个断言函数；用法 `bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`，全部断言通过时退出码 0 并打印 `ALL CHECKS PASS`）；`baseline.md` 记录改动前的失败证据
 
-- [ ] **第 1 步：编写断言脚本**
+- [x] **第 1 步：编写断言脚本**
 
 创建 `docs/superpowers/evals/2026-09-19-multi-phase/check.sh`，内容如下（此时只有任务 1 的既有状态断言，后续任务各自追加）：
 
@@ -65,7 +65,7 @@ exit "$fail"
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：3 条基线反向断言全部 PASS、打印 `ALL CHECKS PASS`（证明改动前"顺序阶段"支持不存在——这就是 RED 证据的静态部分）
 
-- [ ] **第 2 步：编写基线记录**
+- [x] **第 2 步：编写基线记录**
 
 创建 `docs/superpowers/evals/2026-09-19-multi-phase/baseline.md`：
 
@@ -101,12 +101,12 @@ exit "$fail"
 本次改动的验证 = 本基线 + check.sh 结构断言 + 整分支自审。
 ```
 
-- [ ] **第 3 步：运行脚本，确认基线成立**
+- [x] **第 3 步：运行脚本，确认基线成立**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`（3 条基线断言 PASS）
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add docs/superpowers/evals/2026-09-19-multi-phase/
@@ -123,7 +123,7 @@ git commit -m "docs(eval): add multi-phase baseline evidence and check script"
 - 消费（Consumes）：任务 1 的 `check.sh` 骨架（check 函数）
 - 产出（Produces）：技能文本中的锚点字符串——"顺序阶段"、"多阶段路线图（Multi-phase roadmaps）"、`docs/superpowers/roadmaps/`、"整条路线图出现在一份规格"（任务 6 的一致性检查引用这些字符串）
 
-- [ ] **第 1 步：追加断言（RED）**
+- [x] **第 1 步：追加断言（RED）**
 
 在 `check.sh` 的任务 1 断言块之后追加（注意：先把任务 1 的三条"基线"反向断言整块删除——它们记录的是改动前状态，任务 2 落地后必然 FAIL，属于一次性基线证据，运行记录已留在 baseline.md）：
 
@@ -139,7 +139,7 @@ check "brainstorming：自审范围检查" grep -q "整条路线图出现在一�
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：5 条新断言 FAIL（RED）
 
-- [ ] **第 2 步：编辑技能文档**
+- [x] **第 2 步：编辑技能文档**
 
 三处编辑，既有文字一律不动，只做替换段落中的原句保留 + 追加：
 
@@ -184,12 +184,12 @@ check "brainstorming：自审范围检查" grep -q "整条路线图出现在一�
 3. **范围检查：** 是否足够聚焦到能放进一份实施计划？还是需要再分解？如果本规格属于某个路线图的阶段，检查的是本阶段——整条路线图出现在一份规格里，就是需要回到路线图再分解的信号。
 ```
 
-- [ ] **第 3 步：运行断言，确认通过**
+- [x] **第 3 步：运行断言，确认通过**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add skills/brainstorming/SKILL.md docs/superpowers/evals/2026-09-19-multi-phase/check.sh
@@ -206,7 +206,7 @@ git commit -m "feat(brainstorming): support sequential phases with roadmap docum
 - 消费（Consumes）：任务 1 的 `check.sh` 骨架
 - 产出（Produces）：计划头部字段 `**路线图（Roadmap）：**`（任务 4、5 的技能引用它；执行者据它判断计划所属阶段）
 
-- [ ] **第 1 步：追加断言（RED）**
+- [x] **第 1 步：追加断言（RED）**
 
 在 `check.sh` 的任务 2 断言之后追加：
 
@@ -220,7 +220,7 @@ check "writing-plans：不横跨阶段" grep -q "绝不允许一份计划横跨�
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：3 条新断言 FAIL（RED）
 
-- [ ] **第 2 步：编辑技能文档**
+- [x] **第 2 步：编辑技能文档**
 
 **编辑 3a** — 把范围检查这一段（第 23 行）：
 
@@ -250,12 +250,12 @@ check "writing-plans：不横跨阶段" grep -q "绝不允许一份计划横跨�
 **路线图（Roadmap）：** [仅当规格来自路线图时填写：<路线图路径>（阶段 N：<阶段名称>）；否则整行省略——不写"无"。收尾技能据此衔接下一阶段]
 ```
 
-- [ ] **第 3 步：运行断言，确认通过**
+- [x] **第 3 步：运行断言，确认通过**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add skills/writing-plans/SKILL.md docs/superpowers/evals/2026-09-19-multi-phase/check.sh
@@ -272,7 +272,7 @@ git commit -m "feat(writing-plans): distinguish phase plans and add roadmap head
 - 消费（Consumes）：任务 3 的计划头部字段 `**路线图（Roadmap）：**`
 - 产出（Produces）：两处交接语中的字符串"finishing 的路线图检测以此为准"（任务 5 的 finishing 技能是这些交接的接收方）
 
-- [ ] **第 1 步：追加断言（RED）**
+- [x] **第 1 步：追加断言（RED）**
 
 在 `check.sh` 的任务 3 断言之后追加：
 
@@ -285,7 +285,7 @@ check "subagent-driven-development：交接传递路线图" grep -q "finishing �
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：2 条新断言 FAIL（RED）
 
-- [ ] **第 2 步：编辑技能文档**
+- [x] **第 2 步：编辑技能文档**
 
 **编辑 4a** — 在 `skills/executing-plans/SKILL.md` 第 3 步中，把这两行：
 
@@ -313,12 +313,12 @@ check "subagent-driven-development：交接传递路线图" grep -q "finishing �
 使用 superpowers:finishing-a-development-branch。计划头部声明了路线图（Roadmap）字段时，转入时带上路线图路径与阶段号——finishing 的路线图检测以此为准。
 ```
 
-- [ ] **第 3 步：运行断言，确认通过**
+- [x] **第 3 步：运行断言，确认通过**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add skills/executing-plans/SKILL.md skills/subagent-driven-development/SKILL.md docs/superpowers/evals/2026-09-19-multi-phase/check.sh
@@ -335,7 +335,7 @@ git commit -m "feat(execution): pass roadmap context to finishing skill"
 - 消费（Consumes）：任务 4 的交接字符串（路线图路径 + 阶段号）；路线图文档的"阶段列表 / 状态 / 修订记录"小节（由 brainstorming 技能产出）
 - 产出（Produces）：技能中的"路线图检测（Roadmap Check）"小节——闭环的终点：同意后调用 brainstorming 开始下一阶段
 
-- [ ] **第 1 步：追加断言（RED）**
+- [x] **第 1 步：追加断言（RED）**
 
 在 `check.sh` 的任务 4 断言之后追加：
 
@@ -350,7 +350,7 @@ check "finishing：无路线图零变化" grep -q "没有路线图信息时" ski
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：4 条新断言 FAIL（RED）
 
-- [ ] **第 2 步：编辑技能文档**
+- [x] **第 2 步：编辑技能文档**
 
 **编辑 5a** — 把核心原则行（第 10 行）：
 
@@ -383,12 +383,12 @@ check "finishing：无路线图零变化" grep -q "没有路线图信息时" ski
    - **没有**——报告路线图全部完成，结束
 ```
 
-- [ ] **第 3 步：运行断言，确认通过**
+- [x] **第 3 步：运行断言，确认通过**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add skills/finishing-a-development-branch/SKILL.md docs/superpowers/evals/2026-09-19-multi-phase/check.sh
@@ -405,7 +405,7 @@ git commit -m "feat(finishing): add roadmap check step to close the phase loop"
 - 消费（Consumes）：任务 2-5 产出的全部锚点字符串（"路线图（Roadmap）"、"顺序阶段"、"路线图检测（Roadmap Check）"、"finishing 的路线图检测以此为准"）
 - 产出（Produces）：`verification.md`——GREEN 证据与后续 drill eval 的待办记录
 
-- [ ] **第 1 步：追加跨技能一致性断言**
+- [x] **第 1 步：追加跨技能一致性断言**
 
 在 `check.sh` 的任务 5 断言之后追加：
 
@@ -416,7 +416,7 @@ check "一致性：术语不漂移（无 Phase 大写混用为中文语境主词
 check "一致性：前后端描述同一交接契约" bash -c 'grep -q "路线图检测以此为准" skills/executing-plans/SKILL.md && grep -q "路线图检测以此为准" skills/subagent-driven-development/SKILL.md && grep -q "路线图检测（Roadmap Check）" skills/finishing-a-development-branch/SKILL.md'
 ```
 
-- [ ] **第 2 步：编写验证记录**
+- [x] **第 2 步：编写验证记录**
 
 创建 `docs/superpowers/evals/2026-09-19-multi-phase/verification.md`（内容中的 `<输出>` 由实际运行输出替换，其余照写）：
 
@@ -468,12 +468,12 @@ hooks/、scripts/、tests/ 文件改动——以此代替"跑基础设施测试"
 风险由整分支自审核实。
 ```
 
-- [ ] **第 3 步：运行完整脚本，确认全部通过**
+- [x] **第 3 步：运行完整脚本，确认全部通过**
 
 运行：`bash docs/superpowers/evals/2026-09-19-multi-phase/check.sh`
 预期：`ALL CHECKS PASS`（含任务 6 的 3 条一致性断言）
 
-- [ ] **第 4 步：提交**
+- [x] **第 4 步：提交**
 
 ```bash
 git add docs/superpowers/evals/2026-09-19-multi-phase/
