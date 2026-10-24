@@ -1,31 +1,29 @@
 ---
 name: requesting-code-review
-description: 当完成任务、实施主要功能或在合并之前验证工作是否符合要求时使用
+description: 在实施计划中的所有任务执行完成之后、合并到主分支之前使用，以核实整体工作是否符合要求
 ---
 
 # 请求代码审查
 
-派遣代码审查者子代理以在问题级联之前捕获它们。审查者获得精确构建的上下文进行评估——永远不是你的会话历史。
+派遣代码审查者子代理，让问题在被合并进主分支、扩散成更大范围的问题之前就被抓住。审查者获得精确构建的上下文进行评估——永远不是你的会话历史。
 
-**核心原则：** 早期审查，经常审查。
+**核心原则：** 在所有任务执行完成之后才进入整体代码审查——它是交付前的收尾关卡，不是任务之间的例行步骤。
 
 ## 何时请求审查
 
-**强制：**
-- 子代理驱动开发中每个任务之后
-- 完成主要功能后
-- 合并到 main 之前
+**强制——只有以下时机才进入本技能：**
+- 实施计划（或整段工作）中的**所有任务都已执行完成**之后：对全部交付内容做一次整体审查
+- 合并到 main 之前：作为合并前的最后一道确认
 
-**可选但有价值：**
-- 卡住时（新鲜视角）
-- 重构之前（基线检查）
-- 修复复杂 bug 后
+**不要在以下时机进入本技能：**
+- 计划执行中途、刚完成个别任务时——单任务把关属于执行流程内部（例如子代理驱动开发中每完成一个任务就做的规格/质量审查），不要打断执行去请求整体审查
+- 卡住、重构前或修复复杂 bug 之后想找人看看时——先用相应技能解决眼前的问题，整体代码审查一律留到所有任务执行完成之后
 
 ## 如何请求
 
 **1. 获取 git SHAs：**
 ```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # 或：git merge-base origin/main HEAD
+BASE_SHA=$(git merge-base main HEAD)  # 整段工作的起始提交；简单场景可用 HEAD~1 或 origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
@@ -48,16 +46,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 ## 示例
 
 ```
-[刚完成任务 2：添加验证函数]
+[实施计划中的所有任务（任务 1-3）都已执行完成，工作已全部提交在分支上]
 
-你：让我在继续之前请求代码审查。
+你：所有任务都完成了，现在进入整体代码审查。
 
-BASE_SHA=$(git log --oneline | grep "任务 1" | head -1 | cut -d' ' -f1)
+BASE_SHA=$(git merge-base main HEAD)
 HEAD_SHA=$(git rev-parse HEAD)
 
 [派遣代码审查者子代理]
-  DESCRIPTION: 添加了 verifyIndex() 和 repairIndex()，包含 4 种问题类型
-  PLAN_OR_REQUIREMENTS: 来自 docs/superpowers/plans/deployment-plan.md 的任务 2
+  DESCRIPTION: 按计划完成全部任务：添加了 verifyIndex() 和 repairIndex()，包含 4 种问题类型
+  PLAN_OR_REQUIREMENTS: docs/superpowers/plans/deployment-plan.md（全部任务）
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
 
@@ -66,10 +64,10 @@ HEAD_SHA=$(git rev-parse HEAD)
   问题：
     重要：缺少进度指示器
     次要：报告间隔的魔术数字（100）
-  评估：准备继续
+  评估：需要修复
 
-你：[修复进度指示器]
-[继续任务 3]
+你：[修复进度指示器，重跑相关测试]
+[对修复范围做一次限定范围复审，确认干净后] 进入合并，使用 superpowers:finishing-a-development-branch 收尾。
 ```
 
 ## 常见合理化
