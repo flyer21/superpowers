@@ -1,37 +1,37 @@
-# Flowcharts in Skills
+# 技能中的流程图
 
-Part of superpowers:writing-skills.
+属于 superpowers:writing-skills 的一部分。
 
-## Flowchart Usage
+## 流程图使用
 
 ```dot
 digraph when_flowchart {
-    "Need to show information?" [shape=diamond];
-    "Decision where I might go wrong?" [shape=diamond];
-    "Use markdown" [shape=box];
-    "Small inline flowchart" [shape=box];
+    "需要展示信息？" [shape=diamond];
+    "我可能出错的决策在哪里？" [shape=diamond];
+    "使用 markdown" [shape=box];
+    "小型内联流程图" [shape=box];
 
-    "Need to show information?" -> "Decision where I might go wrong?" [label="yes"];
-    "Decision where I might go wrong?" -> "Small inline flowchart" [label="yes"];
-    "Decision where I might go wrong?" -> "Use markdown" [label="no"];
+    "需要展示信息？" -> "我可能出错的决策在哪里？" [label="是"];
+    "我可能出错的决策在哪里？" -> "小型内联流程图" [label="是"];
+    "我可能出错的决策在哪里？" -> "使用 markdown" [label="否"];
 }
 ```
 
-**Use flowcharts ONLY for:**
-- Non-obvious decision points
-- Process loops where you might stop too early
-- "When to use A vs B" decisions
+**仅在以下情况使用流程图：**
+- 非明显的决策点
+- 你可能过早停止的流程循环
+- "何时使用 A vs B"决策
 
-**Never use flowcharts for:**
-- Reference material → Tables, lists
-- Code examples → Markdown blocks
-- Linear instructions → Numbered lists
-- Labels without semantic meaning (step1, helper2)
+**永远不要使用流程图用于：**
+- 参考材料 → 表格、列表
+- 代码示例 → Markdown 块
+- 线性指令 → 编号列表
+- 没有语义意义的标签（step1、helper2）
 
-See `graphviz-conventions.dot` in this directory for graphviz style rules.
+参见此目录中的 `graphviz-conventions.dot` 获取 graphviz 样式规则。
 
-**Visualizing for your human partner:** Use `render-graphs.js` in the writing-skills directory to render a skill's flowcharts to SVG, run from there:
+**为你的合作伙伴可视化：** 使用 writing-skills 目录中的 `render-graphs.js` 将技能的流程图渲染为 SVG，从那里运行：
 ```bash
-node ./render-graphs.js ../some-skill           # Each diagram separately
-node ./render-graphs.js ../some-skill --combine # All diagrams in one SVG
+node ./render-graphs.js ../some-skill           # 每个图表单独
+node ./render-graphs.js ../some-skill --combine # 所有图表在一个 SVG 中
 ```

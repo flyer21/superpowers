@@ -1,64 +1,57 @@
-# Case: <session-id>
+# 案例：<session-id>
 
-Workspace: ~/.superpowers/diagnosing-superpowers/<session-id>/
-Created: <ISO timestamp>
+工作区：~/.superpowers/diagnosing-superpowers/<session-id>/
+创建时间：<ISO 时间戳>
 
-## Problem statement (agreed with your human partner)
+## 问题陈述（与你的人类伙伴商定）
 
-<One paragraph. Names the session(s), the turn range if known, what was
-expected, what happened, and the observable that matters: wall-clock,
-tokens, repeated actions, a specific unexpected action.>
+<一段话。命名会话、轮次范围（如果已知）、期望什么、发生了什么，以及重要的可观察结果：挂钟时间、token、重复动作、特定的意外动作。>
 
-Goal is a superpowers bug report: yes | no
+目标是 superpowers bug 报告：yes | no
 
-## Sessions
+## 会话
 
-| Role | Session id | Absolute path | Lines | Bytes | Longest line (bytes) | First prompt (first 120 chars) | First timestamp |
+| 角色 | 会话 id | 绝对路径 | 行数 | 字节数 | 最长行（字节） | 第一个提示（前 120 个字符） | 第一个时间戳 |
 |---|---|---|---|---|---|---|---|
 | main | | | | | | | |
 | subagent | | | | | | | |
 
-Rejected candidates: <id — path — why rejected>, or "none".
+拒绝的候选：<id — 路径 — 为什么拒绝>，或"无"。
 
-Session still running at read time: yes | no (mtime <ISO>, lines <N>)
+读取时会话仍在运行：yes | no（mtime <ISO>，行数 <N>）
 
-## Environment
+## 环境
 
-- OS: <name and version>
-- Harness: <name> <version>
-- Models seen: <model id — where (main / subagent id)>
-- Superpowers install root: <path>; version <x.y.z>; git sha <sha or "not a checkout">
-- Skill files read or injected during the session:
+- 操作系统：<名称和版本>
+- 工具：<name> <version>
+- 见过的模型：<model id — 在哪里（main / subagent id）>
+- Superpowers 安装根目录：<path>；版本 <x.y.z>；git sha <sha 或 "not a checkout">
+- 会话期间读取或注入的技能文件：
 
-| Skill / source path | sha1 or unavailable | Provenance | Supporting location |
+| 技能/来源路径 | sha1 或 unavailable | 来源 | 支持位置 |
 |---|---|---|---|
 
-Label environment and skill observations as historical evidence, unverified
-snapshot, current observation, or unknown. Check supplied provenance notes,
-archives and captured skill bodies before declaring historical information
-unavailable. Missing original paths do not erase retained copies. Current
-versions/mtimes do not establish historical versions; one captured skill body
-does not authenticate an entire installation.
+将环境和技能观察标记为历史证据、未验证快照、当前观察或未知。在声明历史信息不可用之前，检查提供的来源说明、存档和捕获的技能体。缺失的原始路径不会擦除保留的副本。当前版本/mtime 不会建立历史版本；一个捕获的技能体不能验证整个安装。
 
-- Other plugins / extensions / MCP servers configured: <list, or "none found">
-- Instruction files present (paths only): <list>
+- 配置的其他插件/扩展/MCP 服务器：<列表，或"未找到">
+- 存在的指令文件（仅路径）：<列表>
 
-## Context-safety rules for every reader of these files
+## 这些文件的每个读者的上下文安全规则
 
-- Follow `references/context-safety.md` before reading any file listed here.
-- In a subagent transcript, "user" is the parent agent.
+- 在读取此处列出的任何文件之前，遵循 `references/context-safety.md`。
+- 在子代理转录中，"user" 是父代理。
 
-## Discovered sources and record meanings
+## 已发现的来源和记录含义
 
-- Sources consulted: <absolute path, tool, help, or documentation source>
-- Extraction commands or queries: <bounded commands or tool queries used for each source>
-- Target identity evidence: <session id, working directory, timestamps, matching content, and supporting record locations>
-- Associated sessions: <session id, relationship, and supporting record locations, or "none found">
-- Human messages: <record shape and evidence for its meaning>
-- Injected messages and parent dispatches: <record shape and evidence for its meaning>
-- Assistant messages: <record shape and evidence for its meaning>
-- Tool calls and results: <record shapes, how they match, and evidence for those meanings>
-- Usage counters: <fields, incremental or cumulative semantics, units, and evidence, or "unavailable">
-- Timing: <fields, units, event boundaries, and evidence, or "unavailable">
-- Other relevant records: <models, versions, compactions, or other meanings and evidence>
-- Unresolved information: <missing, inaccessible, ambiguous, or absent information, or "none">
+- 咨询的来源：<绝对路径、工具、帮助或文档来源>
+- 提取命令或查询：<用于每个来源的有界命令或工具查询>
+- 目标身份证据：<会话 id、工作目录、时间戳、匹配内容和支持记录位置>
+- 相关会话：<会话 id、关系和支持记录位置，或"未找到">
+- 人类消息：<记录形状及其含义的证据>
+- 注入的消息和父代理派发：<记录形状及其含义的证据>
+- 助手消息：<记录形状及其含义的证据>
+- 工具调用和结果：<记录形状、它们如何匹配以及这些含义的证据>
+- 用量计数器：<字段、增量或累计语义、单位和证据，或"不可用">
+- 计时：<字段、单位、事件边界和证据，或"不可用">
+- 其他相关记录：<模型、版本、压缩或其他含义和证据>
+- 未解决的信息：<缺失、无法访问、不明确或不存在的信息，或"无">

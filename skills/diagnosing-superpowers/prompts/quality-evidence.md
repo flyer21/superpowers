@@ -1,26 +1,11 @@
-Read `prompts/analyst-common.md` first; it gives your role, inputs,
-context-safety rules, and the return format. This file adds the dimension.
+首先阅读 `prompts/analyst-common.md`；它给出了你的角色、输入、上下文安全规则和返回格式。本文件添加维度。
 
-Dimension: Quality evidence
+维度：质量证据
 
-Judge the process against its own claims. This is not a code review; do
-not evaluate the code the session produced.
+根据会话自身的声明来判断过程。这不是代码审查；不要评估会话产生的代码。
 
-1. Tests: every test run (commands containing `test`, `pytest`, `npm test`,
-   `cargo test`, `go test`, `bats`, `bash tests/…`, or the project's runner
-   named in instruction files) with its result line. Report runs that
-   failed and what the assistant did next.
-2. Verification behind claims: find assistant text claiming done, fixed,
-   passing, verified, works, complete. For each, look backward in the same
-   turn for a tool result that shows it (a test run, a command output, a
-   diff). Report claims with no supporting result in that turn.
-3. Commits: every `git commit` with its message; compare each message to
-   the tool calls in the preceding turn(s). Report commits whose message
-   claims work that no tool call performed, and work performed that was
-   never committed when the agreed plan said it would be.
-4. Review feedback: where a reviewer (human or subagent) raised points,
-   find the response. Report points acknowledged but not acted on, and
-   points dismissed without a stated reason.
-5. Acceptance criteria: if the case file's problem statement or the
-   agreed plan states criteria, report each as met / not met /
-   not checked with the evidence line.
+1. 测试：每次测试运行（包含 `test`、`pytest`、`npm test`、`cargo test`、`go test`、`bats`、`bash tests/…` 或指令文件中命名的项目运行器的命令）及其结果行。报告失败的运行以及助手接下来做了什么。
+2. 声明背后的验证：找到声称已完成、已修复、已通过、已验证、可行、已完成的助手文本。对于每个声明，在同一轮次中向前查找显示它的工具结果（测试运行、命令输出、差异）。报告该轮次中没有支持结果的声明。
+3. 提交：每次 `git commit` 及其提交信息；将每个信息与 preceding 轮次中的工具调用进行比较。报告那些信息声称有工具调用未执行的工作的提交，以及商定计划说应该提交但从未提交的工作。
+4. 审查反馈：当审查者（人类或子代理）提出意见时，找到响应。报告已确认但未采取行动的意见，以及没有说明理由就被驳回的意见。
+5. 验收标准：如果案例文件的问题陈述或商定计划中规定了标准，报告每个标准为 满足/未满足/未检查，并附上证据行。

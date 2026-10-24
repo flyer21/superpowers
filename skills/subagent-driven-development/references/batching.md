@@ -1,11 +1,5 @@
-# Batching Small Same-Shape Work
+# 批量处理小型同构工作
 
-Part of superpowers:subagent-driven-development.
+属于 superpowers:subagent-driven-development 的一部分。
 
-**Batch small same-shape work.** When the plan lists several tasks that are
-each a small, independent edit of the same kind — the same one-line fix,
-constant change, or field addition repeated across files — do not dispatch
-one subagent per task. Compose ONE dispatch brief listing every file and
-its change, send the whole batch to a single subagent, and review its diff
-as one unit. Reserve one-dispatch-per-task for work that needs its own
-judgment, its own tests, or its own review surface.
+**批量处理小型同构工作。** 当计划列出多个任务，每个任务都是相同类型的小型独立编辑——跨文件重复的相同单行修复、常量更改或字段添加——不要为每个任务派遣一个子代理。编写一个列出每个文件及其更改的单一派遣简报，将整个批次发送给单个子代理，并作为一个单元审查其 diff。将每个任务一次派遣保留给需要自己判断、自己测试或自己审查表面的工作。

@@ -1,28 +1,12 @@
-Read `prompts/analyst-common.md` first; it gives your role, inputs,
-context-safety rules, and the return format. This file adds the dimension.
+首先阅读 `prompts/analyst-common.md`；它给出了你的角色、输入、上下文安全规则和返回格式。本文件添加维度。
 
-Dimension: Cost and time
+维度：成本和时间
 
-Account for where tokens and wall-clock went.
+统计 token 和挂钟时间的去向。
 
-1. Tokens. Use only the usage records and counter meanings established in the
-   case file. State whether each counter is incremental or cumulative before
-   calculating totals; difference cumulative observations without turning a
-   missing observation into zero. Report the five turns with the largest
-   supported totals and the supported totals per associated session.
-2. Wall-clock. Use the evidenced timestamp fields, event boundaries, and units
-   recorded in the case file. Report the five longest supported turns and any
-   gap longer than ten minutes between consecutive events (idle, waiting on an
-   associated session, or waiting on your human partner; say which only when
-   the records show it).
-3. Largest tool results: use the case file's evidenced tool-result records to
-   report the ten largest results with their tool and turn. Measure records
-   before extracting bounded content.
-4. Compactions: count and locate records whose meaning as compaction events was
-   established during discovery. Report available before/after counters and
-   what the session was doing when each fired; mark unsupported fields absent.
-5. Associated sessions: count them and report supported usage, duration, and
-   dispatching turn for each.
-6. Report the turns, subagents, tools, or repeats that dominate the
-   totals, with numbers. Do not speculate about why a
-   turn was expensive beyond what the transcript shows.
+1. Token。仅使用案例文件中建立的用量记录和计数器含义。在计算总数之前声明每个计数器是增量还是累计；对累计观测值做差值计算，不要把缺失的观测值当作零。报告支持总数最大的五个轮次以及每个相关会话的支持总数。
+2. 挂钟时间。使用案例文件中记录的时间戳字段、事件边界和单位。报告支持的最长五个轮次，以及连续事件之间超过十分钟的任何间隙（空闲、等待相关会话，或等待你的人类伙伴；仅当记录显示时才说明是哪一种）。
+3. 最大的工具结果：使用案例文件中记录的工具结果记录，报告十个最大的结果及其工具和轮次。在提取有界内容之前先测量记录。
+4. 压缩：计数并定位那些在发现过程中被确定为压缩事件含义的记录。报告可用的前后计数器，以及每次触发时会话正在做什么；标记不支持的字段为缺失。
+5. 相关会话：计数并报告每个会话的支持用量、持续时间和派发轮次。
+6. 报告主导总数的轮次、子代理、工具或重复，附带数字。不要超出转录显示的内容去推测为什么某个轮次很昂贵。

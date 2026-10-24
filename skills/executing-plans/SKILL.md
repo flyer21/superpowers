@@ -1,321 +1,175 @@
 ---
 name: executing-plans
-description: Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available
+description: 当在当前会话中作为实施者自己执行实施计划时使用——你的（人类）搭档选择了内联执行，或没有可用的子代理工具
 ---
 
-# Executing Plans
+# 执行计划
 
-Execute the plan yourself, task by task, in this session: no implementer
-subagent per task, no reviewer per task. One fresh-context review of the
-whole branch at the end.
+你在本会话中自己逐任务执行计划：没有每个任务的实施子代理，没有每个任务的审查者。最后对整个分支进行一次新鲜上下文的审查。
 
-**Why inline:** Subagent-driven development pays for a fresh implementer
-and a fresh reviewer on every task, each re-reading the codebase from zero.
-Inline execution pays for one context (yours) plus one reviewer at the end.
-What it gives up is a fresh context per task and a second pair of eyes per
-task. This skill keeps what those two things bought, by other means: the
-brief is the spec, the ledger is your memory, TDD is the per-task gate, and
-the final reviewer is the second pair of eyes.
+**为什么内联：** 子代理驱动开发为每个任务支付一个新鲜实施者和一个新鲜审查者的成本，每个都从零开始重新阅读代码库。内联执行为一个上下文（你的）加上最后的一个审查者付费。它放弃的是每个任务的新鲜上下文和每个任务的第二双眼睛。本技能通过其他方式保留那两样东西买到的东西：简报是规格说明，账本是你的记忆，TDD 是每个任务的关卡，最终审查者是第二双眼睛。
 
-**Core principle:** The plan already did the thinking. Execute it exactly,
-prove each step with a test you watched fail and then pass, and leave a
-record that survives your own forgetting.
+**核心原则：** 计划已经完成了思考。精确执行它，用你看着失败然后通过的测试证明每个步骤，并留下能经受你自己遗忘的记录。
 
-**Narration:** between tool calls, narrate at most one short line — the
-ledger and the tool results carry the record.
+**叙述：** 在工具调用之间，最多叙述一行简短的话——账本和工具结果承载记录。
 
-**Continuous execution:** Do not pause to check in with your human partner
-between tasks. They chose inline execution to spend less, not to answer
-"should I continue?" after every task. Execute all tasks from the plan
-without stopping.
+**持续执行：** 不要在任务之间暂停与你的（人类）搭档确认。他们选择内联执行是为了花更少的时间，而不是在每个任务后回答"我应该继续吗？"。执行计划中的所有任务，不要停止。
 
-**Rulings, not stalls.** Conflicts, ambiguities, plan defects — decide them.
-The spec is the binding authority, the plan is its argument, and your
-judgment settles what neither answers. Record every decision in the ledger
-as `Ruling: <what you decided> — <why> — <what it costs if wrong>`, and keep
-going. Deviating from the plan without a ledgered ruling is a decision made
-in secret.
+**裁决，而不是停滞。** 冲突、歧义、计划缺陷——决定它们。规格说明是具有约束力的权威，计划是它的论证，你的判断解决两者都无法回答的问题。将每个决定记录在账本中，格式为 `Ruling: <你决定了什么> — <为什么> — <如果错了的代价>`，然后继续。没有账本裁决而偏离计划是秘密做出的决定。
 
-Four things stop you, and only these: an irreversible or destructive
-operation; a security-sensitive action; a side effect outside this worktree
-that norms say you ask about first (a merge, a push to a shared branch, a
-publish); and a plan so broken that every path forward is a guess. For
-those, stop and ask.
+只有四件事能让你停下来，且只有这四件：不可逆或破坏性操作；安全敏感操作；此 worktree 之外且规范要求你先询问的副作用（合并、推送到共享分支、发布）；以及计划如此破碎以至于每条前进路径都是猜测。对于这些，停下来询问。
 
-## When to Use
+## 何时使用
 
-- You have a plan from superpowers:writing-plans and your human partner
-  chose inline execution at the handoff.
-- Your harness has no subagent tool (see the per-platform references in
-  `../using-superpowers/references/`). Never fabricate a dispatch; run
-  the plan here.
-- Tasks are mostly independent — the same precondition as
-  superpowers:subagent-driven-development.
+- 你有一个来自 superpowers:writing-plans 的计划，且你的（人类）搭档在交接时选择了内联执行。
+- 你的 harness 没有子代理工具（参见 `../using-superpowers/references/` 中每个平台的参考）。永远不要伪造派遣；在这里运行计划。
+- 任务 mostly 独立——与 superpowers:subagent-driven-development 相同的前提条件。
 
-A fully specified plan makes inline execution transcription plus testing:
-it runs well on a mid-tier session model, and the one place the most
-capable model earns its cost is the final review, which this skill
-dispatches separately. Tell your human partner so when they choose inline.
+一个完全指定的计划使内联执行成为转录加测试：它在中级会话模型上运行良好，而最有能力的模型赚取其成本的一个地方是最终审查，本技能会单独派遣它。当他们选择内联时告诉你的（人类）搭档这一点。
 
-Prefer superpowers:subagent-driven-development when your human partner
-wants a review gate on every task, or when the plan is long enough that
-its later tasks would run on a compacted context. Inline execution over a
-long plan still works — the ledger is what makes it recoverable — but the
-last tasks get the least of you.
+当你的（人类）搭档想要每个任务的审查关卡，或计划足够长以至于其后面的任务会在压缩的上下文上运行时，优先使用 superpowers:subagent-driven-development。长计划上的内联执行仍然有效——账本使其可恢复——但最后的任务得到的你最少的你。
 
-## The Process
+## 流程
 
 ```dot
 digraph process {
     rankdir=TB;
 
     subgraph cluster_per_task {
-        label="Per Task";
-        "task-start: brief + BASE; read the brief" [shape=box];
-        "Work the steps in order: TDD, run every verification, read every output" [shape=box];
-        "Step output matches plan's Expected?" [shape=diamond];
-        "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [shape=box];
-        "Commit as the plan's commit steps say" [shape=box];
-        "Completion contract met?" [shape=diamond];
-        "task-done: run tests, ledger the result; mark todo complete" [shape=box];
+        label="每个任务";
+        "task-start: 简报 + BASE; 阅读简报" [shape=box];
+        "按顺序工作步骤：TDD，运行每次验证，阅读每个输出" [shape=box];
+        "步骤输出匹配计划的预期？" [shape=diamond];
+        "计划错了？裁决并记账。代码错了？systematic-debugging" [shape=box];
+        "按计划的提交步骤提交" [shape=box];
+        "完成合同满足？" [shape=diamond];
+        "task-done: 运行测试，账本记录结果；标记 todo 完成" [shape=box];
     }
 
-    "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" [shape=box];
-    "More tasks remain?" [shape=diamond];
-    "Final whole-branch review (fresh reviewer if you have one)" [shape=box];
-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" [shape=box];
-    "Final review clean: delete this plan's workspace" [shape=box];
-    "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+    "设置：worktree，工作区 + 账本，阅读计划 + 规格说明，预检扫描" [shape=box];
+    "还有更多任务？" [shape=diamond];
+    "最终整分支审查（如果有新鲜审查者）" [shape=box];
+    "重新评级，然后：关键/重要 → 一次修复传递，每个修复 RED→GREEN + 绿色套件；次要 → 记账" [shape=box];
+    "最终审查干净：删除此计划的工作区" [shape=box];
+    "使用 superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
-    "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" -> "task-start: brief + BASE; read the brief";
-    "task-start: brief + BASE; read the brief" -> "Work the steps in order: TDD, run every verification, read every output";
-    "Work the steps in order: TDD, run every verification, read every output" -> "Step output matches plan's Expected?";
-    "Step output matches plan's Expected?" -> "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [label="no"];
-    "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" -> "Work the steps in order: TDD, run every verification, read every output";
-    "Step output matches plan's Expected?" -> "Commit as the plan's commit steps say" [label="yes, last step"];
-    "Commit as the plan's commit steps say" -> "Completion contract met?";
-    "Completion contract met?" -> "Work the steps in order: TDD, run every verification, read every output" [label="no - finish the task"];
-    "Completion contract met?" -> "task-done: run tests, ledger the result; mark todo complete" [label="yes"];
-    "task-done: run tests, ledger the result; mark todo complete" -> "More tasks remain?";
-    "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
-    "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
-    "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger";
-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: delete this plan's workspace";
-    "Final review clean: delete this plan's workspace" -> "Use superpowers:finishing-a-development-branch";
+    "设置：worktree，工作区 + 账本，阅读计划 + 规格说明，预检扫描" -> "task-start: 简报 + BASE; 阅读简报";
+    "task-start: 简报 + BASE; 阅读简报" -> "按顺序工作步骤：TDD，运行每次验证，阅读每个输出";
+    "按顺序工作步骤：TDD，运行每次验证，阅读每个输出" -> "步骤输出匹配计划的预期？";
+    "步骤输出匹配计划的预期？" -> "计划错了？裁决并记账。代码错了？systematic-debugging" [label="no"];
+    "计划错了？裁决并记账。代码错了？systematic-debugging" -> "按顺序工作步骤：TDD，运行每次验证，阅读每个输出";
+    "步骤输出匹配计划的预期？" -> "按计划的提交步骤提交" [label="yes, last step"];
+    "按计划的提交步骤提交" -> "完成合同满足？";
+    "完成合同满足？" -> "按顺序工作步骤：TDD，运行每次验证，阅读每个输出" [label="no - finish the task"];
+    "完成合同满足？" -> "task-done: 运行测试，账本记录结果；标记 todo 完成" [label="yes"];
+    "task-done: 运行测试，账本记录结果；标记 todo 完成" -> "还有更多任务？";
+    "还有更多任务？" -> "task-start: 简报 + BASE; 阅读简报" [label="yes"];
+    "还有更多任务？" -> "最终整分支审查（如果有新鲜审查者）" [label="no"];
+    "最终整分支审查（如果有新鲜审查者）" -> "重新评级，然后：关键/重要 → 一次修复传递，每个修复 RED→GREEN + 绿色套件；次要 → 记账";
+    "重新评级，然后：关键/重要 → 一次修复传递，每个修复 RED→GREEN + 绿色套件；次要 → 记账" -> "最终审查干净：删除此计划的工作区";
+    "最终审查干净：删除此计划的工作区" -> "使用 superpowers:finishing-a-development-branch";
 }
 ```
 
-## Setup
+## 设置
 
-Ensure the work happens in an isolated workspace: use
-superpowers:using-git-worktrees to create one or verify the existing one.
-Never start implementation on a main/master branch without your human
-partner's explicit consent.
+确保工作在隔离的工作区中进行：使用 superpowers:using-git-worktrees 创建一个或验证现有的。永远不要在未经你的（人类）搭档明确同意的情况下在 main/master 分支上开始实施。
 
-Conversation memory does not survive compaction. An inline executor that
-loses its place re-implements tasks whose commits already exist — the same
-failure as a controller re-dispatching them, paid for in your own context.
-Track progress in a ledger file, not only in todos. Harness todos are a
-live view; the ledger is the record.
+对话记忆无法在压缩中存活。丢失位置的内联执行者会重新实施提交已存在的任务——与控制器重新派遣它们相同的失败，以你自己的上下文为代价。在账本文件中跟踪进度，而不仅仅是在 todos 中。Harness todos 是实时视图；账本是记录。
 
-The workspace and ledger are shared with superpowers:subagent-driven-development
-— same directory, same format — so a plan can change executors mid-flight
-and the new one resumes from the same ledger.
+工作区和账本与 superpowers:subagent-driven-development 共享——相同目录，相同格式——所以计划可以在飞行中更改执行者，新的执行者从同一个账本恢复。
 
-- Each plan owns a workspace: at skill start, run
-  `../subagent-driven-development/scripts/sdd-workspace PLAN_FILE` — it
-  prints the plan's git-ignored directory
-  (`<repo-root>/.superpowers/sdd/<plan-basename>/`), home to every
-  artifact for THIS plan: ledger, briefs, review packages. Another plan's
-  directory is never yours to read or write.
-- Check for this plan's ledger at `<workspace>/progress.md`. If its first
-  line names your plan file, tasks with a `Task <N>: complete` line are
-  DONE — do not redo them; resume at the first task without one. Their
-  commits exist in git even when your context no longer remembers making
-  them: after compaction, trust the ledger and `git log` over your own
-  recollection. A ledger whose first line names a different plan file is
-  another plan's progress: leave it and start your own, fresh.
-- Create the ledger with its identity as the first line:
-  `# SDD ledger — plan: <plan file path>`.
-- `git clean -fdx` will destroy the workspace (it's git-ignored scratch);
-  if that happens, recover from `git log`.
+- 每个计划拥有一个工作区：在技能启动时，运行 `../subagent-driven-development/scripts/sdd-workspace PLAN_FILE`——它打印计划的 git 忽略目录（`<repo-root>/.superpowers/sdd/<plan-basename>/`），是本计划所有工件的家：账本、简报、审查包。其他计划的目录永远不是你可以读写的。
+- 在 `<workspace>/progress.md` 检查此计划的账本。如果其第一行命名了你的计划文件，带有 `Task <N>: complete` 行的任务是完成的——不要重做它们；在第一个没有该行的任务处恢复。即使你的上下文不再记得制作它们，它们的提交也存在于 git 中：压缩后，信任账本和 `git log` 胜过你自己的回忆。第一行命名不同计划文件的账本是另一个计划的进度：离开它并开始你自己的，全新的。
+- 创建账本，其身份作为第一行：`# SDD ledger — plan: <计划文件路径>`。
+- `git clean -fdx` 会破坏工作区（它是 git 忽略的临时文件）；如果发生，从 `git log` 恢复。
 
-Read the plan once, note its context and Global Constraints, and create a
-todo per task. If the plan names a Spec, read that too: the spec is the
-authority the plan argues from, and conflicts inside the plan resolve
-against it. A plan with no reachable spec gets a ledger note saying so —
-rulings made without one are provisional.
+阅读计划一次，注意其上下文和全局约束，并为每个任务创建一个 todo。如果计划命名了规格说明，也阅读它：规格说明是计划论证的权威，计划内部的冲突以其为准解决。没有可达规格说明的计划会获得一个账本说明——没有它的裁决是临时的。
 
-**REQUIRED SUB-SKILL:** load superpowers:test-driven-development now,
-before Task 1. It governs every step of every task below; a plan whose
-steps already say "write the failing test first" does not exempt you
-from reading it.
+**必需的子技能：** 现在加载 superpowers:test-driven-development，在任务 1 之前。它管理下面每个任务的每个步骤；步骤已经说"先写失败测试"的计划不能免除你阅读它。
 
-Before Task 1, scan the plan for conflicts between tasks. The plan's
-Interfaces blocks tell you where to look: for every task that consumes
-what an earlier task produces, one ledger row — the two tasks, what one
-produces against what the other consumes, and what you found. Tasks that
-share nothing get no row; a plan whose tasks share nothing gets the single
-line `Pre-flight: no shared interfaces`. Rule on each conflict a row
-surfaces with the spec as the binding authority, record the ruling beside
-its row, and start Task 1. Each task's own text is checked when you read
-its brief, not here.
+在任务 1 之前，扫描计划以查找任务之间的冲突。计划的 Interfaces 块告诉你在哪里查找：对于每个消费早期任务产出的任务，一行账本——两个任务，一个产出对另一个消费，以及你发现的。什么都不共享的任务没有行；任务什么都不共享的计划获得单行 `Pre-flight: no shared interfaces`。用规格说明作为约束权威对每行表面上的冲突进行裁决，将裁决记录在其行旁边，然后开始任务 1。每个任务自己的文本在你阅读其简报时检查，不是在这里。
 
-## The Task Loop
+## 任务循环
 
-Everything you print, and every tool result, stays resident in your
-context for the rest of the session. Redirect long test output to a file
-in the workspace and read its tail; read a brief, not the whole plan.
+你打印的所有内容，以及每个工具结果，都会在会话的其余时间内驻留在你的上下文中。将长测试输出重定向到工作区中的文件并读取其尾部；阅读简报，而不是整个计划。
 
-### 1. Take the task
+### 1. 接受任务
 
-- Run this skill's `scripts/task-start PLAN_FILE N`. It prints the brief
-  path and BASE (the commit the task's range is cut from) in one call.
-  Read the brief for every task, including ones you remember from setup:
-  what you remember is a summary, the brief has the exact values,
-  signatures, and test cases.
-- Mark the task's todo in_progress.
+- 运行此技能的 `scripts/task-start PLAN_FILE N`。它在一个调用中打印简报路径和 BASE（任务范围切割自的提交）。阅读每个任务的简报，包括你在设置中记得的任务：你记得的是摘要，简报有确切的值、签名和测试用例。
+- 标记任务的 todo in_progress。
 
-Every tool call is a turn that re-reads your whole context. Bookkeeping
-rides along with work — a ledger append in the same call as the commit,
-never in a call of its own.
+每个工具调用都是一个重新读取你整个上下文的轮次。簿记与工作一起运行——账本附加在与提交相同的调用中，永远不在自己的调用中。
 
-### 2. Work the steps
+### 2. 工作步骤
 
-The plan's steps are already in RED-GREEN order; follow them in that
-order under superpowers:test-driven-development, loaded at setup. A test
-step's code is written first and run first. Watching it fail is a step,
-not a formality — a test that passes before the implementation exists is
-a finding about the test.
+计划的步骤已经是 RED-GREEN 顺序；在 superpowers:test-driven-development 下按该顺序跟随它们，在设置时加载。测试步骤的代码首先写入并首先运行。看着它失败是一个步骤，不是形式——在实现存在之前通过的测试是关于测试的发现。
 
-Every step that runs a command has an `Expected:` line. Run the command,
-read its output, and compare. Three outcomes:
+运行命令的每个步骤都有一个 `Expected:` 行。运行命令，读取其输出，并比较。三种结果：
 
-- **Matches.** Next step.
-- **The code is wrong.** Use superpowers:systematic-debugging. Find the
-  cause; never patch the symptom to make the step's output match.
-- **The plan is wrong** — a step contradicts the spec, an interface from an
-  earlier task doesn't match what this task consumes, a command that
-  cannot work. Rule on the smallest change that satisfies the spec, ledger
-  it as `Task <N>: Ruling: <finding> — <what you decided and why>`, and
-  continue. The ruling is carried, not remembered: later tasks that touch
-  the same interface read it from the ledger.
+- **匹配。** 下一步。
+- **代码错了。** 使用 superpowers:systematic-debugging。找到原因；永远不要修补症状以使步骤输出匹配。
+- **计划错了**——步骤与规格说明矛盾，早期任务的接口与此任务消费的不匹配，无法工作的命令。对满足规格说明的最小更改进行裁决，将其作为 `Task <N>: Ruling: <发现> — <你决定了什么和为什么>` 记入账本，然后继续。裁决被携带，不是被记住：触及相同接口的后续任务从账本读取它。
 
-Commit as the plan's commit steps say. A task that spans several commits
-is fine; BASE is what the review range is cut from, never `HEAD~1`.
+按计划的提交步骤提交。跨越几个提交的任务是可以的；BASE 是审查范围切割自的，永远不是 `HEAD~1`。
 
-### 3. The completion contract
+### 3. 完成合同
 
-Before a task's ledger line, all of the following are true, with evidence
-in this session — not inferred from the diff looking right:
+在任务的账本行之前，以下所有内容都是真实的，在本会话中有证据——不是从 diff 看起来正确推断的：
 
-- Every test the brief names exists and ran in this task, and you read
-  the output.
-- The final test run for the task passed — `task-done` is that run, and
-  it writes the command and result into the ledger line.
-- Every `Expected:` line in the brief was compared against real output.
-- Every deviation from the brief has a `Ruling:` line in the ledger.
+- 简报命名的每个测试都存在并在本任务中运行，且你读取了输出。
+- 任务的最终测试运行通过——`task-done` 是该运行，它将命令和结果写入账本行。
+- 简报中的每个 `Expected:` 行都与真实输出进行了比较。
+- 与简报的每个偏差都有账本中的 `Ruling:` 行。
 
-**REQUIRED SUB-SKILL:** superpowers:verification-before-completion governs
-the claim. If any item is missing, the task is not complete: finish it.
+**必需的子技能：** superpowers:verification-before-completion 管理该声明。如果任何项目缺失，任务未完成：完成它。
 
-### 4. Complete the task
+### 4. 完成任务
 
-Run this skill's `scripts/task-done PLAN_FILE N BASE -- <test command>`
-with the test command the brief names for the whole task. It runs the
-tests, keeps the full output in the workspace, prints the tail, and — only
-if they pass — appends the completion line to the ledger:
+运行此技能的 `scripts/task-done PLAN_FILE N BASE -- <测试命令>`，使用简报为整个任务命名的测试命令。它运行测试，将完整输出保留在工作区中，打印尾部，并且——只有当它们通过时——将完成行附加到账本：
 
-`Task <N>: complete (commits <base7>..<head7>, tests: <command> → <result>)`
+`Task <N>: complete (commits <base7>..<head7>, tests: <命令> → <结果>)`
 
-A failing run records nothing; the task is not complete. When it records,
-mark the todo complete and take the next task.
+失败的运行不记录任何内容；任务未完成。当它记录时，标记 todo 完成并接受下一个任务。
 
-## Final Review
+## 最终审查
 
-Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
-(MERGE_BASE = the commit the branch started from, e.g.
-`git merge-base main HEAD`) and review from the file it prints.
+运行 `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支开始自的提交，例如 `git merge-base main HEAD`）并从其打印的文件审查。
 
-**With a subagent tool:** dispatch the reviewer on the most capable
-available model — the whole-branch review is a judgment task — using
-superpowers:requesting-code-review's
-[code-reviewer.md](../requesting-code-review/code-reviewer.md), with the
-package path, the plan and spec paths, the plan's Review Focus section
-verbatim if it has one (the input classes and failure modes the plan's
-tests do not exercise — the reviewer checks each deliberately), and a
-pointer to the ledger's `Ruling:` lines so it can weigh the calls you
-made. Specify the model
-explicitly; an omitted model inherits the session's, which may not be the
-most capable. This is the one fresh context the whole run buys. Do not
-skip it, and do not replace it with your own read of the diff.
+**有子代理工具时：** 在最有能力的可用模型上派遣审查者——整分支审查是判断任务——使用 superpowers:requesting-code-review 的 [code-reviewer.md](../requesting-code-review/code-reviewer.md)，带有包路径、计划和规格说明路径、计划的 Review Focus 部分逐字（如果有的话）（计划的测试未锻炼的输入类和失败模式——审查者故意检查每个），以及指向账本 `Ruling:` 行的指针，以便它可以权衡你做出的调用。明确指定模型；省略的模型继承会话的，可能不是最有能力的。这是整个运行买到的一个新鲜上下文。不要跳过它，不要用你自己的 diff 阅读替换它。
 
-**Without a subagent tool:** read code-reviewer.md and perform that review
-yourself against the package, as a separate pass after the last task's
-ledger line. Write `Final review: self-review (no subagent tool)` to the
-ledger, and say so in your final message: a self-review by the author is
-weaker than a fresh reviewer, and your human partner decides whether that
-is enough before merge.
+**没有子代理工具时：** 阅读 code-reviewer.md 并在最后一个任务的账本行之后作为单独的传递自己对包执行该审查。将 `Final review: self-review (no subagent tool)` 写入账本，并在你的最终消息中这样说：作者的自我审查比新鲜审查者弱，你的（人类）搭档决定这在合并之前是否足够。
 
-Sort the findings before you act on any of them. The reviewer's severity
-labels are advice; the gate is yours. Its "Declined to judge" list is
-yours too: every line there is a ruling you make and ledger, exactly like
-a plan conflict — `Final: Ruling: <behavior the reviewer set aside> —
-<what a reasonable person using this software gets, and why that stands
-or why it is now a finding> — <cost if wrong>`. Re-grade first, by effect: the
-spec is a vision document, and a finding's grade is what a reasonable
-person using this software gets if it ships, not whether the spec names
-the input that triggers it — a reviewer who set a finding at Minor
-because the spec was silent has graded the spec, not the effect. Then:
+在你采取任何行动之前对发现进行排序。审查者的严重性标签是建议；关卡是你的。其"Declined to judge"列表也是你的：那里的每一行都是你做出并记账的裁决，完全像计划冲突——`Final: Ruling: <审查者搁置的行为> — <合理使用此软件的人得到的，以及为什么那成立或为什么现在是发现> — <如果错了的代价>`。首先重新评级，按效果：规格说明是愿景文档，发现的评级是合理使用此软件的人如果发布会得到的，不是规格说明是否命名了触发它的输入——因为规格说明沉默而将发现设为次要的审查者已经评级了规格说明，不是效果。然后：
 
-- **Critical and Important** enter the fix pass.
-- **Minor** goes to the ledger as `Final: minor (deferred): <one-liner>`
-  and to your final message under "Deferred minors". Minors never enter
-  the fix pass, and never become rulings — a ruling is a decision about a
-  conflict, not a note that you declined a polish suggestion.
+- **关键和重要** 进入修复传递。
+- **次要** 进入账本，格式为 `Final: minor (deferred): <一行>` 并进入你的最终消息的"Deferred minors"下。次要永远不进入修复传递，永远不成为裁决——裁求是关于冲突的决定，不是关于你拒绝打磨建议的说明。
 
-Fix the Critical and Important findings yourself — you are the
-implementer here — in ONE pass. Each fix is verified by TDD, not by a
-second reviewer: write the test that reproduces the finding, watch it
-fail, make it pass, then run the whole suite. Record each in the ledger as
-`Final: fixed <finding> — <test name> RED→GREEN, suite <N>/<N>`. A fix
-without a test that failed first is not verified; a suite that is not
-green after the pass means the pass is not over. Do not dispatch a
-re-review: it would re-read a diff whose covering tests already answer
-"addressed" and whose suite run already answers "broke nothing".
+自己修复关键和重要的发现——你是这里的实施者——在一次传递中。每个修复由 TDD 验证，不是由第二个审查者：编写重现发现的测试，看着它失败，使其通过，然后运行整个套件。将每个记录在账本中，格式为 `Final: fixed <发现> — <测试名称> RED→GREEN, suite <N>/<N>`。没有首先失败的测试的修复未经验证；传递后套件不是绿色意味着传递未结束。不要派遣重新审查：它会重新阅读 diff，其覆盖测试已经回答"已解决"，其套件运行已经回答"没有破坏任何东西"。
 
-A finding you decide not to fix is a ruling — `Final: Ruling: <finding> —
-<why the code stands> — <cost if wrong>` — and reaches your human partner
-in the rulings list. There is no second fix pass.
+你决定不修复的发现是裁决——`Final: Ruling: <发现> — <为什么代码成立> — <如果错了的代价>`——并进入裁决列表到达你的（人类）搭档。没有第二次修复传递。
 
-## Finish
+## 完成
 
-Before you delete anything, collect every ledger line containing
-`Ruling:` into your final message under "Rulings I made", in the order you
-made them, each with what it costs if wrong, and every `minor (deferred)`
-line under "Deferred minors". Both lists are exhaustive. Your final
-message is the only place the decisions you took on your human partner's
-behalf — and the findings you chose not to act on — reach them.
+在删除任何内容之前，将每个包含 `Ruling:` 的账本行收集到你的最终消息的"Rulings I made"下，按你做出的顺序，每个带有如果错了的代价，以及每个 `minor (deferred)` 行在"Deferred minors"下。两个列表都是详尽的。你的最终消息是你代表你的（人类）搭档做出的决定——以及你选择不采取行动的发现——到达他们的唯一地方。
 
-When the final review is clean and its fixes are committed, delete this
-plan's workspace directory — the git history is the record now. Sibling
-directories belong to other plans; leave them alone.
+当最终审查干净且其修复已提交时，删除此计划的工作区目录——git 历史现在是记录。兄弟目录属于其他计划；不要动它们。
 
-Use superpowers:finishing-a-development-branch.
+使用 superpowers:finishing-a-development-branch。
 
-## Common Rationalizations
+## 常见合理化
 
-| Excuse | Reality |
-|--------|---------|
-| "I remember what Task N says" | You remember a summary. The brief has the exact values. Read it. |
-| "The plan's code is right, skip watching the test fail" | A test you never saw fail proves nothing. It is one step. Run it. |
-| "I'll run the full suite at the end instead of per step" | Per-step runs are how you learn which step broke it. The end-of-task run is the contract, not a substitute. |
-| "The plan is wrong here, I'll just do the right thing" | Do the right thing and ledger the ruling. Unledgered deviation is a decision made in secret. |
-| "I'll write the ledger lines after a few tasks" | Compaction does not wait for a convenient moment. One line per task, in the same message as the commit. |
-| "Let me check in before the next task" | They chose inline to spend less. Progress prompts spend their time instead. Only the four stops stop you. |
-| "I read my own diff carefully; the final reviewer is redundant" | Same author, same blind spots. The reviewer is the only fresh context this run buys. |
-| "Tests should pass, the change was trivial" | "Should" is not evidence. The contract requires the command and its output. |
-| "Subagents are slow and expensive, I'll skip the final review too" | Inline already removed the per-task reviewers. One review of the whole branch is the floor, not the ceiling. |
-| "The reviewer said Minor, so it's Minor" | The label graded the spec's silence. Grade what the person gets. Re-grade, then gate. |
-| "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
-| "I'll fix the minors too while I'm in there" | Every minor you fix is a test, a fix, and a suite run your partner did not ask for. Ledger them; your partner decides. |
+| 借口 | 现实 |
+|------|------|
+| "我记得任务 N 说什么" | 你记得的是摘要。简报有确切的值。阅读它。 |
+| "计划的代码是对的，跳过看着测试失败" | 你从未看着失败的测试证明不了任何东西。这是一个步骤。运行它。 |
+| "我会在最后运行完整套件而不是每步" | 每步运行是你学习哪步破坏它的方式。任务结束运行是合同，不是替代品。 |
+| "计划在这里错了，我就做正确的事" | 做正确的事并将裁决记账。未记账的偏离是秘密做出的决定。 |
+| "我会在几个任务后写账本行" | 压缩不会等待方便的时刻。每个任务一行，在与提交相同的消息中。 |
+| "让我在下一个任务之前确认" | 他们选择内联是为了花更少。进度提示反而花他们的时间。只有四个停止能停止你。 |
+| "我仔细阅读了自己的 diff；最终审查是多余的" | 同一作者，同一盲点。审查者是这次运行买到的唯一新鲜上下文。 |
+| "测试应该通过，改动是平凡的" | "应该"不是证据。合同需要命令及其输出。 |
+| "子代理慢且贵，我也跳过最终审查" | 内联已经移除了每任务审查者。整个分支的一次审查是地板，不是天花板。 |
+| "审查者说次要，所以是次要" | 标签评级了规格说明的沉默。评级人得到的。重新评级，然后关卡。 |
+| "修复很明显，不需要先失败测试" | 失败测试是发现是真实且现在消失的唯一证明。没有它你只有 diff 和希望。 |
+| "我会在里面时也修复次要" | 你修复的每个次要都是你的搭档没有要求的测试、修复和套件运行。将它们记账；你的搭档决定。 |

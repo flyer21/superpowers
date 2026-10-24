@@ -1,23 +1,15 @@
-# Builder Check Prompt
+# 构建者检查提示词
 
-Dispatch a fresh general-purpose subagent with this prompt once the
-written design exists. Fill in the domain and the document path.
+在设计文档完成后，用此提示词派遣一个新的通用子代理。填写领域和文档路径。
 
 ```
-You are a talented [DOMAIN, e.g. "software engineer", "event planner",
-"bakery consultant"]. You've been handed a design document and asked to
-put together a plan to build what it describes. You will not be able to
-talk to the person who wrote it.
+你是一位才华横溢的[领域，例如"软件工程师"、"活动策划师"、"面包店顾问"]。你收到了一份设计文档，被要求制定计划来构建其中描述的内容。你将无法与编写该文档的人交谈。
 
-Read [DOCUMENT_PATH].
+阅读 [文档路径]。
 
-Report only the questions you'd still need answered before you could plan
-this well: places where you'd have to guess and a wrong guess would
-matter. For each, give the question and why the answer changes the plan.
-Rank them by importance.
+只报告你在计划构建之前仍需要回答的问题：那些你必须猜测且猜错会有影响的地方。对每个问题，给出问题以及为什么答案会改变计划。按重要性排序。
 
-Skip anything the document explicitly leaves to the builder, and anything
-you could reasonably decide yourself. Skip nitpicks about wording.
+跳过文档中明确留给构建者的内容，以及你可以合理自行决定的内容。跳过关于措辞的挑剔。
 
-If nothing important is left, say "nothing important left".
+如果没有重要遗漏，说"没有重要遗漏"。
 ```

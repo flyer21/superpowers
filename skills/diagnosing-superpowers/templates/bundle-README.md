@@ -1,77 +1,50 @@
-# Superpowers session diagnosis bundle
+# Superpowers 会话诊断捆绑包
 
-Session: <session-id>
-Harness: <name> <version> (<provenance label>)    Superpowers: <version> (<sha or "not a checkout">; <provenance label>)
-Redaction level: skeleton | evidence | full
-Built: <ISO timestamp>
+会话：<session-id>
+工具：<name> <version>（<来源标签>）    Superpowers：<version>（<sha 或 "not a checkout">；<来源标签>）
+脱敏级别：skeleton | evidence | full
+构建时间：<ISO 时间戳>
 
-Qualify header version fields as historical evidence, unverified snapshot,
-current observation, or unknown. `environment.json` carries the same
-provenance distinctions for every environment field and its supporting
-location.
+将头部版本字段限定为历史证据、未验证快照、当前观察或未知。`environment.json` 对每个环境字段及其支持位置携带相同的来源区分。
 
-## What this is
+## 这是什么
 
-A scrubbed record of a coding-agent session that had superpowers installed
-and went wrong. It lets an agent or person who was not present decide
-whether superpowers contributed and, if so, what to change. The report
-inside states what happened with `path:line` evidence. By design it
-contains no diagnosis of superpowers and no proposed fix; that is the
-reader's job.
+一个安装了 superpowers 但出错的编码代理会话的清理记录。它让未在场的代理或人员决定 superpowers 是否有贡献，如果有，应该改变什么。里面的报告用 `path:line` 证据说明发生了什么。按设计，它不包含对 superpowers 的诊断，也不提出修复建议；那是读者的工作。
 
-## Files
+## 文件
 
-- `report.md` — the diagnosis report (problem statement, verdict,
-  environment, sessions, timeline, findings, involvement, coverage notes).
-- `case.md` — the case file the analysts worked from.
-- `environment.json` — machine-readable copy of the environment section.
-- `timeline.md` — the per-turn timeline.
-- `findings/<dimension>.md` — raw analyst findings per dimension.
-- `transcripts/<session-id>.md` — condensed per-turn rendering of each
-  examined session (never the raw JSONL). Tool-result bodies by level:
+- `report.md` — 诊断报告（问题陈述、裁决、环境、会话、时间线、发现、参与度、覆盖说明）。
+- `case.md` — 分析员使用的案例文件。
+- `environment.json` — 环境部分的机器可读副本。
+- `timeline.md` — 每轮次时间线。
+- `findings/<dimension>.md` — 每个维度的原始分析员发现。
+- `transcripts/<session-id>.md` — 每个检查会话的每轮次压缩渲染（绝不是原始 JSONL）。工具结果体按级别：
 
-  | Level | Tool-result bodies |
+  | 级别 | 工具结果体 |
   |---|---|
-  | skeleton | intentionally limited; replaced by `[tool result: <tool>, <bytes> bytes, exit <code>]` |
-  | evidence | kept for cited events, including the commands and results needed to support findings |
-  | full | all kept |
-- `scrub-log.md` — every placeholder used and its category (never the
-  original value).
+  | skeleton | 有意限制；替换为 `[tool result: <tool>, <bytes> bytes, exit <code>]` |
+  | evidence | 为引用的事件保留，包括支持发现所需的命令和结果 |
+  | full | 全部保留 |
+- `scrub-log.md` — 使用的每个占位符及其类别（绝不是原始值）。
 
-## How to read it
+## 如何阅读它
 
-Start with `report.md` §1–2, then §7 (involvement) and the evidence lines
-it cites, then the matching turns in `transcripts/`. `path:line` references
-point at the original files on the reporter's machine; the same line
-numbers are preserved in the condensed transcripts as `[L<n>]` markers.
+从 `report.md` §1–2 开始，然后是 §7（参与度）及其引用的证据行，然后是 `transcripts/` 中匹配的轮次。`path:line` 引用指向报告者机器上的原始文件；相同的行号在压缩转录中作为 `[L<n>]` 标记保留。
 
-## Redaction
+## 脱敏
 
-Placeholders look like `<EMAIL-1>`, `<PERSON-2>`, `<SECRET-3>`, `<HOST-4>`,
-`<REPO-5>`, `<ORG-6>`, `<PROPRIETARY-7>`; home paths are rewritten to `~/…`. The same placeholder
-always refers to the same original value within this bundle.
+占位符看起来像 `<EMAIL-1>`、`<PERSON-2>`、`<SECRET-3>`、`<HOST-4>`、`<REPO-5>`、`<ORG-6>`、`<PROPRIETARY-7>`；家目录路径被重写为 `~/…`。同一个占位符在此捆绑包中始终指向相同的原始值。
 
-## Producer instructions
+## 生产者指令
 
-Completed bundles replace these instructions with actual results.
+完成的捆绑包用实际结果替换这些指令。
 
-After scrubbing, check every material exported finding using only this bundle:
-resolve its citation to an included transcript/source marker, read the cited
-command/result or quotation, and verify that it supports the claim. Path and
-line existence alone are insufficient. Record specific limitations when the
-redaction level or necessary withholding removes support.
+清理后，仅使用此捆绑包检查每个导出的重要发现：将其引用解析为包含的转录/来源标记，读取引用的命令/结果或引用，并验证它是否支持该声明。路径和行号的存在本身是不够的。当脱敏级别或必要的扣留删除支持时，记录具体的限制。
 
-Reconcile report, case, environment, findings, README and any local issue
-draft. Refresh scrub-log counts against final files excluding the log itself.
-Remove stale export statements; distinguish bundle preparation from archive
-delivery. Retain a mapping from historical anchors to included evidence.
+协调报告、案例、环境、发现、README 和任何本地问题草稿。根据最终文件刷新 scrub-log 计数，排除日志本身。删除过时的导出声明；区分捆绑包准备和存档交付。保留从历史锚点到包含证据的映射。
 
-Record the independent privacy audit separately from evidence usefulness:
-- Privacy audit: CLEAN or unresolved misses.
-- Evidence support: supported or limited, with affected findings and reasons.
+独立记录隐私审计与证据有用性：
+- 隐私审计：CLEAN 或未解决的遗漏。
+- 证据支持：支持或受限，附带受影响的发现和原因。
 
-If content changes after checking, repeat the affected checks. Present the
-final log, file list and both outcomes for the existing archive approval.
-Archive the reviewed files and verify the delivered archive matches them.
-Record archive delivery outside the reviewed bundle rather than changing its
-contents after approval. Scrubbing is not exhaustive privacy certification.
+如果检查后内容发生变化，重复受影响的检查。呈现最终日志、文件列表和两个结果以供现有存档批准。存档已审查的文件并验证交付的存档与它们匹配。在批准后记录存档交付，而不是更改其内容。清理不是穷尽的隐私认证。

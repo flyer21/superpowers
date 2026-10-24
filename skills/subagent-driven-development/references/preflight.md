@@ -1,26 +1,12 @@
-# The Pre-flight Scan
+# 预飞行扫描
 
-Part of superpowers:subagent-driven-development. Run it once, before
-dispatching Task 1.
+属于 superpowers:subagent-driven-development 的一部分。在派遣任务 1 之前运行一次。
 
-Before dispatching Task 1, scan the plan once for conflicts, writing down
-what you checked as you check it:
+在派遣任务 1 之前，扫描计划一次以查找冲突，在检查时写下你检查的内容：
 
-- tasks that contradict each other or the plan's Global Constraints
-- anything the plan explicitly mandates that the review rubric treats as a
-  defect (a test that asserts nothing, verbatim duplication of a logic block)
+- 相互矛盾或与计划的全局约束矛盾的任务
+- 计划明确要求但审查评分视为缺陷的任何东西（没有断言的测试、逻辑块的逐字复制）
 
-The scan's output is a table, not a verdict. One row for every pair of tasks
-that share a file or an interface: the two tasks, what one produces against
-what the other consumes, and what you found. One row for every task: whether
-its own text agrees with itself — the tests it specifies against the code it
-specifies, the files it creates against the files it later touches. "The scan
-is clean" without those rows is not a scan you ran.
+扫描的输出是表格，而不是裁决。对于共享文件或接口的每对任务一行：两个任务、一个产生的内容对抗另一个消费的内容，以及你发现的内容。对于每个任务一行：其自身文本是否同意自身——它指定的测试对抗它指定的代码、它创建的文件对抗它后来触及的文件。"扫描干净"没有这些行不是你运行的扫描。
 
-Write the table to the ledger. Rule on everything you find before execution
-begins — each finding against the plan text that mandates it — and record
-each ruling in the ledger. If the scan is clean, proceed without comment.
-Rule on each conflict it surfaces — the spec is the binding authority, the
-plan is its argument — record the ruling beside its row, and dispatch
-Task 1. The review loop remains the net for conflicts that only emerge from
-implementation.
+将表格写入账本。在执行开始之前裁决你发现的所有东西——每个发现对抗强制它的计划文本——并在账本记录每个裁决。如果扫描干净，继续而不评论。裁决它暴露的每个冲突——规格是绑定权威，计划是其论点——在行旁边记录裁决，并派遣任务 1。审查循环保持为仅从实现中出现的冲突的网。

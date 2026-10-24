@@ -1,20 +1,11 @@
-Read `prompts/analyst-common.md` first; it gives your role, inputs,
-context-safety rules, and the return format. This file adds the dimension.
+首先阅读 `prompts/analyst-common.md`；它给出了你的角色、输入、上下文安全规则和返回格式。本文件添加维度。
 
-Dimension: Request conflicts
+维度：请求冲突
 
-1. List every human prompt with line and turn. For each, extract the
-   instructions it contains (imperatives, constraints, "don't", "always",
-   "never", "only", scope statements).
-2. Report:
-   - two human instructions that cannot both be followed (quote both, with
-     lines), and what the assistant did;
-   - a human instruction that conflicts with an instruction file loaded in
-     the session (CLAUDE.md, AGENTS.md, GEMINI.md, or the harness's
-     equivalent; paths are in the case file), quoting both;
-   - a human instruction to skip, ignore, or override a step, skill, or
-     rule, and what happened afterwards;
-   - an instruction the assistant asked to clarify and the answer, when the
-     answer changed scope.
-3. Do not judge whether your human partner was right. Report the conflict
-   and the assistant's resolution.
+1. 列出每个带有行号和轮次的人类提示。对于每个提示，提取其中包含的指令（祈使句、约束、"不要"、"总是"、"从不"、"仅"、范围声明）。
+2. 报告：
+   - 两个无法同时遵循的人类指令（引用两者，附行号），以及助手做了什么；
+   - 与会话中加载的指令文件（CLAUDE.md、AGENTS.md、GEMINI.md 或工具等效文件；路径在案例文件中）冲突的人类指令，引用两者；
+   - 要求跳过、忽略或覆盖某个步骤、技能或规则的人类指令，以及之后发生了什么；
+   - 助手要求澄清的指令以及答案，当答案改变了范围时。
+3. 不要评判你的人类伙伴是否正确。报告冲突以及助手的解决方式。

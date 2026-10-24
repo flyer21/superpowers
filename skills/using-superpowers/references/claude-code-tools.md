@@ -1,29 +1,11 @@
-# Claude Code Tool Notes
+# Claude Code 工具说明
 
-Claude Code is the reference harness: skills speak its vocabulary
-(`Agent` for a subagent dispatch, todos, `Skill`). These notes cover the
-one place Claude Code can run a plan cheaper than the skills' default
-shape. It is opt-in by your human partner and changes nothing the skills
-require.
+Claude Code 是参考工具：技能使用其词汇（`Agent` 表示子代理派发、待办、`Skill`）。这些说明涵盖了 Claude Code 可以比技能默认形状更便宜地运行计划的唯一地方。它由你的人类伙伴选择启用，不改变技能要求的任何内容。
 
-## Cheaper orchestration for subagent-driven development
+## 子代理驱动开发的更便宜编排
 
-The controller session is the most expensive seat in a
-superpowers:subagent-driven-development run: it reads every dispatch
-result and every report, and it usually runs on the session's most
-capable model. Claude Code supports nested subagents (three layers below
-the main conversation by default; `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`
-adjusts it), so the whole loop can run one layer down.
+控制器会话是 superpowers:subagent-driven-development 运行中最昂贵的席位：它读取每个派发结果和每个报告，并且通常在会话中最强大的模型上运行。Claude Code 支持嵌套子代理（默认在主对话下方三层；`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` 可调整），所以整个循环可以在下一层运行。
 
-When your human partner asks for it — or has said the session model is
-too expensive to spend on coordination — dispatch ONE orchestrator
-subagent on a mid-tier model with the plan path and the instruction to
-use superpowers:subagent-driven-development end to end. The orchestrator
-dispatches its own implementers and reviewers per that skill's Model
-Selection; the workspace and ledger live on disk, so nothing is lost to
-the extra layer. Its final message must carry the "Rulings I made" list
-verbatim — that list is how the decisions reach your human partner, and
-you relay it, not summarize it.
+当你的人类伙伴要求时 — 或者说会话模型太昂贵而不能花在协调上 — 在中等模型上派发一个编排器子代理，附带计划路径和使用 superpowers:subagent-driven-development 端到端的指令。编排器根据该技能的模型选择派发自己的实现者和审查者；工作区和账本存在于磁盘上，所以额外层不会丢失任何东西。其最终消息必须逐字携带"我做出的裁决"列表 — 该列表是决策如何传达给你的人类伙伴的方式，你中继它，不总结它。
 
-Do this only for a whole plan. Nesting a single task's dispatch buys
-nothing and adds a seat.
+仅对整个计划执行此操作。嵌套单个任务的派发没有任何好处，只会增加一个席位。

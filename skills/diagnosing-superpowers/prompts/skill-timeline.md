@@ -1,30 +1,16 @@
-Read `prompts/analyst-common.md` first; it gives your role, inputs,
-context-safety rules, and the return format. This file adds the dimension.
+首先阅读 `prompts/analyst-common.md`；它给出了你的角色、输入、上下文安全规则和返回格式。本文件添加维度。
 
-Dimension: Skill timeline
+维度：技能时间线
 
-Build the per-human-turn record of skill and plugin use, then look for gaps.
+构建每个人类轮次的技能和插件使用记录，然后查找间隙。
 
-1. List the human prompts with line numbers and timestamps.
-2. Using the skill-invocation and attribution meanings established in the case
-   file, list every explicit invocation, active-skill attribution, or read of a
-   file named `SKILL.md`. Record the line, the skill name, and the human turn it
-   happened in.
-3. List every non-superpowers plugin, skill, agent type, MCP server, or
-   hook used. Use only the evidenced tool, attribution, agent-dispatch, MCP,
-   and hook meanings recorded in the case file; identify values associated
-   with something other than `superpowers`.
-4. For each human turn, compare the request text against the trigger
-   descriptions of the superpowers skills installed (read
-   `<install root>/skills/*/SKILL.md` frontmatter `description` lines; the
-   install root is in the case file). Report as findings:
-   - a skill invoked, with the request that preceded it (one finding per
-     invocation is fine when there are few; group by skill when many);
-   - a turn whose request matches a skill's trigger description with no
-     invocation in that turn (state which description matched and quote
-     the request);
-   - a skill invoked one or more turns after the matching request (late);
-   - each non-superpowers plugin/skill/tool used, with where.
+1. 列出带有行号和时间戳的人类提示。
+2. 使用案例文件中建立的技能调用和归属含义，列出每个显式调用、活跃技能归属或对名为 `SKILL.md` 的文件的读取。记录行号、技能名称以及它发生的人类轮次。
+3. 列出使用的每个非 superpowers 插件、技能、代理类型、MCP 服务器或钩子。仅使用案例文件中记录的工具、归属、代理派发、MCP 和钩子含义；识别与 `superpowers` 以外的东西关联的值。
+4. 对于每个人类轮次，将请求文本与已安装的 superpowers 技能的触发描述进行比较（读取 `<安装根目录>/skills/*/SKILL.md` 的 frontmatter `description` 行；安装根目录在案例文件中）。作为发现报告：
+   - 触发的技能，以及其 preceding 的请求（当数量少时每个触发一个发现即可；当数量多时按技能分组）；
+   - 请求与技能的触发描述匹配但在该轮次中未触发的轮次（说明哪个描述匹配并引用请求）；
+   - 在匹配请求之后一个或多个轮次才触发的技能（延迟）；
+   - 使用的每个非 superpowers 插件/技能/工具，以及在哪里使用。
 
-Do not say whether a missed or late trigger was wrong. Report the match
-and the absence; the reader decides.
+不要说错过或延迟的触发是否错误。报告匹配和缺失；读者自行决定。

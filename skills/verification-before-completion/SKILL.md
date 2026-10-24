@@ -1,120 +1,120 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
+description: 当即将声称工作完成、已修复或通过时，在提交或创建 PR 之前使用——需要运行验证命令并确认输出，然后才能做出任何成功声明；证据永远在断言之前
 ---
 
-# Verification Before Completion
+# 完成前验证
 
-## Overview
+## 概述
 
-**Core principle:** Evidence before claims, always.
+**核心原则：** 证据先于声明，永远如此。
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+**违反此规则的字面就是违反其精神。**
 
-## The Iron Law
-
-```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-```
-
-If you haven't run the verification command in this message, you cannot claim it passes.
-
-## The Gate Function
+## 铁律
 
 ```
-BEFORE claiming any status or expressing satisfaction:
-
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
-
-Skip any step = lying, not verifying
+没有新鲜验证证据，不得声称完成
 ```
 
-## Common Failures
+如果你在此消息中没有运行验证命令，你就不能声称它通过。
 
-| Claim | Requires | Not Sufficient |
-|-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
+## 关卡函数
 
-## Red Flags - STOP
-
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
-- Trusting agent success reports
-- Relying on partial verification
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without having run verification**
-
-## Rationalization Prevention
-
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
-| "Different words so rule doesn't apply" | Spirit over letter |
-
-## Key Patterns
-
-**Tests:**
 ```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
-❌ "Should pass now" / "Looks correct"
+在声称任何状态或表达满意之前：
+
+1. 识别：什么命令证明此声明？
+2. 运行：执行完整命令（新鲜的、完整的）
+3. 阅读：完整输出，检查退出代码，计算失败
+4. 验证：输出是否确认声明？
+   - 如果否：用证据说明实际状态
+   - 如果是：用证据说明声明
+5. 只有那时：做出声明
+
+跳过任何步骤 = 撒谎，不是验证
 ```
 
-**Regression tests (TDD Red-Green):**
+## 常见失败
+
+| 声明 | 需要 | 不足够 |
+|------|------|--------|
+| 测试通过 | 测试命令输出：0 失败 | 之前的运行，"应该通过" |
+| Linter 干净 | Linter 输出：0 错误 | 部分检查，外推 |
+| 构建成功 | 构建命令：exit 0 | Linter 通过，日志看起来好 |
+| Bug 已修复 | 测试原始症状：通过 | 代码已更改，假设已修复 |
+| 回归测试工作 | 红绿循环已验证 | 测试通过一次 |
+| 代理完成 | VCS diff 显示更改 | 代理报告"成功" |
+| 要求满足 | 逐行检查清单 | 测试通过 |
+
+## 危险信号 - 停止
+
+- 使用"应该"、"可能"、"似乎"
+- 在验证之前表达满意（"太好了！"、"完美！"、"完成！"等）
+- 即将提交/推送/PR 而没有验证
+- 信任代理成功报告
+- 依赖部分验证
+- 想"就这一次"
+- 累了并希望工作结束
+- **任何暗示成功而没有运行验证的措辞**
+
+## 合理化预防
+
+| 借口 | 现实 |
+|------|------|
+| "现在应该工作了" | 运行验证 |
+| "我有信心" | 信心 ≠ 证据 |
+| "就这一次" | 没有例外 |
+| "Linter 通过了" | Linter ≠ 编译器 |
+| "代理说成功" | 独立验证 |
+| "我累了" | 疲惫不是借口 |
+| "部分检查足够了" | 部分证明不了任何东西 |
+| "不同的措辞所以规则不适用" | 精神高于字面 |
+
+## 关键模式
+
+**测试：**
 ```
-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
-❌ "I've written a regression test" (without red-green verification)
+✅ [运行测试命令] [看到：34/34 通过] "所有测试通过"
+❌ "现在应该通过了" / "看起来正确"
 ```
 
-**Build:**
+**回归测试（TDD 红绿）：**
 ```
-✅ [Run build] [See: exit 0] "Build passes"
-❌ "Linter passed" (linter doesn't check compilation)
-```
-
-**Requirements:**
-```
-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
-❌ "Tests pass, phase complete"
+✅ 编写 → 运行（通过） → 恢复修复 → 运行（必须失败） → 恢复 → 运行（通过）
+❌ "我写了回归测试"（没有红绿验证）
 ```
 
-**Agent delegation:**
+**构建：**
 ```
-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
-❌ Trust agent report
+✅ [运行构建] [看到：exit 0] "构建通过"
+❌ "Linter 通过了"（linter 不检查编译）
 ```
 
-## When To Apply
+**要求：**
+```
+✅ 重读计划 → 创建检查清单 → 验证每个 → 报告缺口或完成
+❌ "测试通过，阶段完成"
+```
 
-**ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Committing, PR creation, task completion
-- Moving to next task
-- Delegating to agents
+**代理委派：**
+```
+✅ 代理报告成功 → 检查 VCS diff → 验证更改 → 报告实际状态
+❌ 信任代理报告
+```
 
-**Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
+## 何时应用
+
+**永远在之前：**
+- 任何成功/完成声明的变体
+- 任何满意表达
+- 关于工作状态的任何正面声明
+- 提交、PR 创建、任务完成
+- 移动到下一个任务
+- 委派给代理
+
+**规则适用于：**
+- 确切短语
+- 改述和同义词
+- 成功的暗示
+- 任何暗示完成/正确性的通信

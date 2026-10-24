@@ -1,23 +1,14 @@
-# Antigravity CLI (`agy`) Tool Mapping
+# Antigravity CLI (`agy`) 工具映射
 
-Skills speak in actions ("dispatch a subagent", "create a todo", "read a file"). On the Antigravity CLI (`agy`) these resolve to the tools below.
+技能以动作表述（"派发子代理"、"创建待办"、"读取文件"）。在 Antigravity CLI (`agy`) 上，这些动作解析为以下工具。
 
-| Action skills request | Antigravity CLI equivalent |
+| 技能请求的动作 | Antigravity CLI 等效 |
 |----------------------|----------------------|
-| Dispatch a subagent (`Subagent (general-purpose):` template) | `invoke_subagent` with a built-in `TypeName` — `self` for full-capability work, `research` for read-only |
-| Task tracking ("create a todo", "mark complete") | a **task artifact** — `write_to_file` with `IsArtifact: true` and `ArtifactType: "task"` (see [Task tracking](#task-tracking)). **Not** `manage_task`, which manages background processes. |
+| 派发子代理（`Subagent (general-purpose):` 模板） | `invoke_subagent`，使用内置 `TypeName` — `self` 用于全能力工作，`research` 用于只读 |
+| 任务跟踪（"创建待办"、"标记完成"） | **任务工件** — 使用 `write_to_file`，设置 `IsArtifact: true` 和 `ArtifactType: "task"`（参见[任务跟踪](#task-tracking)）。**不是** `manage_task`，后者管理后台进程。 |
 
-## Task tracking
+## 任务跟踪
 
-Antigravity has **no todo tool** (`manage_task` manages background
-processes — `list`/`kill`/`status`/`send_input` — it is *not* a checklist). When a
-skill says to create a todo list or track tasks, maintain a **task artifact**: a
-markdown checklist saved with `write_to_file` (`IsArtifact: true`,
-`ArtifactMetadata.ArtifactType: "task"`), edited with `replace_file_content` /
-`multi_replace_file_content` as you go.
+Antigravity **没有待办工具**（`manage_task` 管理后台进程 — `list`/`kill`/`status`/`send_input` — 它*不是*检查清单）。当技能说要创建待办列表或跟踪任务时，维护一个**任务工件**：使用 `write_to_file`（`IsArtifact: true`，`ArtifactMetadata.ArtifactType: "task"`）保存的 markdown 检查清单，在过程中使用 `replace_file_content` / `multi_replace_file_content` 编辑。
 
-At the start of any multi-step task, create the task artifact listing every step of
-your plan. As you complete each step, edit the artifact to mark it done (`- [x]`).
-If the plan changes, update the checklist. Keep it current — it is your source of
-truth for what remains; once the conversation gets long, re-read it before starting
-each step.
+在任何多步骤任务的开始时，创建任务工件，列出计划的每个步骤。完成每个步骤时，编辑工件将其标记为完成（`- [x]`）。如果计划发生变化，更新检查清单。保持其最新状态 — 它是剩余工作的真相来源；一旦对话变长，在开始每个步骤之前重新阅读它。

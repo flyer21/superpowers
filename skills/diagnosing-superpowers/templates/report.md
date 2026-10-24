@@ -1,82 +1,76 @@
-# Session diagnosis: <session-id>
+# 会话诊断：<session-id>
 
-Report path: ~/.superpowers/diagnosing-superpowers/<session-id>/report.md
-Written: <ISO timestamp>
+报告路径：~/.superpowers/diagnosing-superpowers/<session-id>/report.md
+写入时间：<ISO 时间戳>
 
-## 1. Problem statement (REQUIRED)
+## 1. 问题陈述（必需）
 
-<Copied from the case file.>
+<从案例文件复制。>
 
-## 2. Triage verdict (REQUIRED)
+## 2. Triage 裁决（必需）
 
-<What the evidence shows happened around the reported problem. Prose, with
-`path:line` after every claim. State confidence: high / medium / low, and
-what would raise it. No statement about what superpowers should do.>
+<证据显示在报告的问题周围发生了什么。散文形式，每个声明后附 `path:line`。声明置信度：high / medium / low，以及什么能提高它。不说明 superpowers 应该做什么。>
 
-## 3. Environment (REQUIRED)
+## 3. 环境（必需）
 
-- OS:
-- Harness and version:
-- Models seen:
-- Superpowers install root / version / git sha:
-- Skill files read or injected (sha1 table from the case file):
-- Other plugins, extensions, MCP servers:
-- Instruction files present (paths only):
+- 操作系统：
+- 工具和版本：
+- 见过的模型：
+- Superpowers 安装根目录/版本/git sha：
+- 读取或注入的技能文件（来自案例文件的 sha1 表）：
+- 其他插件、扩展、MCP 服务器：
+- 存在的指令文件（仅路径）：
 
-Label every environment field and skill observation as historical evidence,
-unverified snapshot, current observation, or unknown, and record its
-supporting evidence location.
+将每个环境字段和技能观察标记为历史证据、未验证快照、当前观察或未知，并记录其支持证据位置。
 
-## 4. Sessions examined (REQUIRED)
+## 4. 检查的会话（必需）
 
-| Role | Session id | Absolute path | Lines | Bytes |
+| 角色 | 会话 id | 绝对路径 | 行数 | 字节数 |
 |---|---|---|---|---|
 
-Rejected candidates: <id — path — why>, or "none".
+拒绝的候选：<id — 路径 — 为什么>，或"无"。
 
-## 5. Timeline (REQUIRED)
+## 5. 时间线（必需）
 
-One row per human-typed prompt. Events column lists skills invoked,
-subagents dispatched, compaction, errors, resumes, aborts.
+每个人类输入的提示一行。事件列列出触发的技能、派发的子代理、压缩、错误、恢复、中止。
 
-| Turn | Line | Time | Request (one line) | Events |
+| 轮次 | 行号 | 时间 | 请求（一行） | 事件 |
 |---|---|---|---|---|
 
-## 6. Findings (REQUIRED, one subsection per dimension)
+## 6. 发现（必需，每个维度一个子节）
 
-Each finding:
+每个发现：
 ```
-- finding: <one sentence>
-  evidence: <path:line> — "<short quote>"
+- finding: <一句话>
+  evidence: <path:line> — "<短引用>"
   turns: <first>–<last>
   confidence: high | medium | low
 ```
-A dimension with nothing to report says `none found — checked: <what was checked>`.
+没有可报告的发现的维度说 `none found — checked: <检查了什么>`。
 
-### 6.1 Skill timeline
-### 6.2 Plan adherence
-### 6.3 Repeated work
-### 6.4 Stumbles
-### 6.5 Quality evidence
-### 6.6 Request conflicts
-### 6.7 Cost and time
-### 6.8 Other plugins and skills used
+### 6.1 技能时间线
+### 6.2 计划遵循度
+### 6.3 重复工作
+### 6.4 挫折点
+### 6.5 质量证据
+### 6.6 请求冲突
+### 6.7 成本和时间
+### 6.8 使用的其他插件和技能
 
-## 7. Superpowers involvement (REQUIRED)
+## 7. Superpowers 参与度（必需）
 
 not indicated | possible | likely
 
-Evidence lines: <path:line list>. This section states involvement only. It
-does not name a defect and does not propose a change.
+证据行：<path:line 列表>。此部分仅说明参与度。它不命名缺陷，也不提出更改。
 
-## 8. Coverage notes (REQUIRED)
+## 8. 覆盖说明（必需）
 
-- Not read: <ranges, files, and why>
-- Harness features unavailable: <list or none>
-- Session was in progress at read time: yes/no
-- For your human partner to double-check: <list or none>
+- 未读取：<范围、文件及原因>
+- 不可用的工具功能：<列表或无>
+- 读取时会话正在进行中：yes/no
+- 需要你的人类伙伴双重检查：<列表或无>
 
-## 9. Similar sessions (only when requested)
+## 9. 相似会话（仅在请求时）
 
-| Session id | Path | Date | Harness | Matched | Did not match |
+| 会话 id | 路径 | 日期 | 工具 | 匹配 | 不匹配 |
 |---|---|---|---|---|---|

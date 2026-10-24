@@ -1,19 +1,19 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: 当面对 2 个以上相互独立、可在无共享状态或顺序依赖的情况下处理的任务时使用
 ---
 
-# Dispatching Parallel Agents
+# 派遣并行代理
 
-## Overview
+## 概述
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+你将任务委托给具有隔离上下文的专门代理。通过精确构建它们的指令和上下文，你确保它们保持专注并成功完成任务。它们永远不应继承你会话的上下文或历史——你精确构建它们所需的一切。这也为你自己的协调工作保留了上下文。
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+当你有多个不相关的失败（不同的测试文件、不同的子系统、不同的 bug）时，顺序调查会浪费时间。每次调查都是独立的，可以并行进行。
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
+**核心原则：** 为每个独立问题域派遣一个代理。让它们并发工作。
 
-## When to Use
+## 何时使用
 
 ```dot
 digraph when_to_use {
@@ -33,135 +33,135 @@ digraph when_to_use {
 }
 ```
 
-**Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+**使用时机：**
+- 3 个以上测试文件因不同根本原因失败
+- 多个子系统独立损坏
+- 每个问题可以在没有其他人上下文的情况下理解
+- 调查之间没有共享状态
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+**不要使用时机：**
+- 失败是相关的（修复一个可能修复其他）
+- 需要理解完整系统状态
+- 代理会相互干扰
 
-## The Pattern
+## 模式
 
-### 1. Identify Independent Domains
+### 1. 识别独立域
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+按损坏内容对失败分组：
+- 文件 A 测试：工具审批流
+- 文件 B 测试：批量完成行为
+- 文件 C 测试：中止功能
 
-Each domain is independent - fixing tool approval doesn't affect abort tests.
+每个域是独立的——修复工具审批不影响中止测试。
 
-### 2. Create Focused Agent Tasks
+### 2. 创建聚焦的代理任务
 
-Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+每个代理获得：
+- **具体范围：** 一个测试文件或子系统
+- **清晰目标：** 让这些测试通过
+- **约束：** 不要更改其他代码
+- **预期输出：** 你发现和修复的内容摘要
 
-### 3. Dispatch in Parallel
+### 3. 并行派遣
 
-Issue all three subagent dispatches in the same response — they run in parallel:
+在同一响应中发出所有三个子代理派遣——它们并行运行：
 
 ```text
-Subagent (general-purpose): "Fix agent-tool-abort.test.ts failures"
-Subagent (general-purpose): "Fix batch-completion-behavior.test.ts failures"
-Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
-# All three run concurrently.
+子代理（通用）："修复 agent-tool-abort.test.ts 失败"
+子代理（通用）："修复 batch-completion-behavior.test.ts 失败"
+子代理（通用）："修复 tool-approval-race-conditions.test.ts 失败"
+# 所有三个并发运行。
 ```
 
-Multiple dispatch calls in one response = parallel execution. One per response = sequential.
+一个响应中的多个派遣调用 = 并行执行。每个响应一个 = 顺序执行。
 
-### 4. Review and Integrate
+### 4. 审查和集成
 
-When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+当代理返回时：
+- 阅读每个摘要
+- 验证修复不冲突
+- 运行完整测试套件
+- 集成所有更改
 
-## Agent Prompt Structure
+## 代理提示词结构
 
-Good agent prompts are:
-1. **Focused** - One clear problem domain
-2. **Self-contained** - All context needed to understand the problem
-3. **Specific about output** - What should the agent return?
+好的代理提示词：
+1. **聚焦** - 一个清晰的问题域
+2. **自包含** - 理解问题所需的所有上下文
+3. **关于输出具体** - 代理应返回什么？
 
 ```markdown
-Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
+修复 src/agents/agent-tool-abort.test.ts 中的 3 个失败测试：
 
-1. "should abort tool with partial output capture" - expects 'interrupted at' in message
-2. "should handle mixed completed and aborted tools" - fast tool aborted instead of completed
-3. "should properly track pendingToolCount" - expects 3 results but gets 0
+1. "should abort tool with partial output capture" - 期望消息中包含 'interrupted at'
+2. "should handle mixed completed and aborted tools" - 快速工具被中止而不是完成
+3. "should properly track pendingToolCount" - 期望 3 个结果但得到 0
 
-These are timing/race condition issues. Your task:
+这些是时序/竞态条件问题。你的任务：
 
-1. Read the test file and understand what each test verifies
-2. Identify root cause - timing issues or actual bugs?
-3. Fix by:
-   - Replacing arbitrary timeouts with event-based waiting
-   - Fixing bugs in abort implementation if found
-   - Adjusting test expectations if testing changed behavior
+1. 阅读测试文件并理解每个测试验证什么
+2. 识别根本原因——时序问题还是实际 bug？
+3. 修复方法：
+   - 用基于事件的等待替换任意超时
+   - 如果发现中止实现中的 bug 则修复
+   - 如果测试行为已更改则调整测试期望
 
-Do NOT just increase timeouts - find the real issue.
+不要只增加超时——找到真正的问题。
 
-Return: Summary of what you found and what you fixed.
+返回：你发现和修复的内容摘要。
 ```
 
-## Common Mistakes
+## 常见错误
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+**❌ 太宽泛：** "修复所有测试" - 代理迷失
+**✅ 具体：** "修复 agent-tool-abort.test.ts" - 聚焦范围
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+**❌ 没有上下文：** "修复竞态条件" - 代理不知道在哪里
+**✅ 有上下文：** 粘贴错误消息和测试名称
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+**❌ 没有约束：** 代理可能重构所有内容
+**✅ 有约束：** "不要更改生产代码"或"只修复测试"
 
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+**❌ 输出模糊：** "修复它" - 你不知道改变了什么
+**✅ 具体：** "返回根本原因和更改摘要"
 
-## When NOT to Use
+## 何时不使用
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
+**相关失败：** 修复一个可能修复其他——先一起调查
+**需要完整上下文：** 理解需要看到整个系统
+**探索性调试：** 你还不知道什么坏了
+**共享状态：** 代理会干扰（编辑相同文件、使用相同资源）
 
-## Real Example from Session
+## 会话中的真实示例
 
-**Scenario:** 6 test failures across 3 files after major refactoring
+**场景：** 重大重构后 3 个文件中的 6 个测试失败
 
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
+**失败：**
+- agent-tool-abort.test.ts：3 个失败（时序问题）
+- batch-completion-behavior.test.ts：2 个失败（工具未执行）
+- tool-approval-race-conditions.test.ts：1 个失败（执行计数 = 0）
 
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
+**决策：** 独立域——中止逻辑独立于批量完成独立于竞态条件
 
-**Dispatch:**
+**派遣：**
 ```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
+代理 1 → 修复 agent-tool-abort.test.ts
+代理 2 → 修复 batch-completion-behavior.test.ts
+代理 3 → 修复 tool-approval-race-conditions.test.ts
 ```
 
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
+**结果：**
+- 代理 1：用基于事件的等待替换超时
+- 代理 2：修复事件结构 bug（threadId 位置错误）
+- 代理 3：添加等待异步工具执行完成
 
-**Integration:** All fixes independent, no conflicts, full suite green
+**集成：** 所有修复独立，无冲突，完整套件通过
 
-## Verification
+## 验证
 
-After agents return:
-1. **Review each summary** - Understand what changed
-2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
-4. **Spot check** - Agents can make systematic errors
+代理返回后：
+1. **审查每个摘要** - 理解改变了什么
+2. **检查冲突** - 代理是否编辑了相同代码？
+3. **运行完整套件** - 验证所有修复一起工作
+4. **抽查** - 代理可能犯系统性错误

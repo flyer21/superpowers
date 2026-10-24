@@ -1,70 +1,56 @@
-Title: <skill or symptom>: <one-line observable> (<harness>)
+标题：<技能或症状>：<一行可观察结果>（<工具>）
 
-- [x] I searched existing issues and this is not a duplicate (searched: <query terms>; closest: <#n title, or "none">)
+- [x] 我搜索了现有问题，这不是重复项（搜索：<查询术语>；最接近：<#n 标题，或"无">）
 
-## Who's filing this report? (required)
+## 谁在提交此报告？（必需）
 
-<model and harness of this session>, filing on behalf of <how your
-partner wants to be named, or "my human partner">, who asked: "<their
-request from this session that led to the diagnosis or the issue,
-scrubbed>"
+<此会话的模型和工具>，代表 <你的伙伴希望被如何称呼，或"我的人类伙伴"> 提交，他们要求："<导致诊断或问题的会话中的请求，已脱敏>"
 
-## Human-authored summary (required, under 200 words)
+## 人类撰写的摘要（必需，少于 200 字）
 
-<Your partner's own words on what went wrong and what should have
-happened, pasted as written. Ask for them; a placeholder here means the
-issue is not ready to file. If they run long, ask them to trim rather
-than editing their words.>
+<你的伙伴用自己的话说明出了什么问题以及应该发生什么，按原样粘贴。向他们索要；这里的占位符意味着问题尚未准备好提交。如果太长，请他们精简而不是编辑他们的话。>
 
-## Environment (required)
+## 环境（必需）
 
-| Field | Value | Provenance / supporting evidence |
+| 字段 | 值 | 来源/支持证据 |
 |-------|-------|-------------------------------|
-| Superpowers version | <version> (<sha or "not a checkout">) | <historical evidence / unverified snapshot / current observation / unknown>; <location> |
-| Harness (Claude Code, Cursor, etc.) | <harness> | <label>; <location> |
-| Harness version | <version> | <label>; <location> |
-| Your model + version | <model ids seen> | <label>; <location> |
-| All plugins installed | <list> | <label>; <location> |
-| OS + shell | <os version>, <shell> | <label>; <location> |
+| Superpowers 版本 | <version>（<sha 或 "not a checkout">） | <历史证据/未验证快照/当前观察/未知>；<位置> |
+| 工具（Claude Code、Cursor 等） | <harness> | <标签>；<位置> |
+| 工具版本 | <version> | <标签>；<位置> |
+| 你的模型 + 版本 | <model ids seen> | <标签>；<位置> |
+| 安装的所有插件 | <list> | <标签>；<位置> |
+| 操作系统 + shell | <os version>, <shell> | <标签>；<位置> |
 
-## Is this a Superpowers issue or a platform issue?
+## 这是 Superpowers 问题还是平台问题？
 
-- [ ] I confirmed this issue does not occur without Superpowers installed
+- [ ] 我确认了此问题在未安装 Superpowers 时不会出现
 
-How I verified that this issue does not reproduce without Superpowers:
-<"Not tried", or what your partner ran without superpowers and what
-happened, with the transcript path if there is one. Tick the box above
-only when a transcript shows the problem did not recur.>
+我如何验证此问题在未安装 Superpowers 时不会重现：
+<"未尝试"，或你的伙伴在没有 superpowers 的情况下运行了什么以及发生了什么，如果有转录路径请附上。仅当转录显示问题未重现时才勾选上面的框。>
 
-Evidence for involvement is below; it does not establish cause.
+参与度的证据如下；它不建立原因。
 
-## What happened?
+## 发生了什么？
 
-<Problem statement, then the triage verdict, with `path:line` citations
-rewritten as `transcript line <n>`.>
+<问题陈述，然后是 triage 裁决，将 `path:line` 引用重写为 `transcript line <n>`。>
 
-## Steps to reproduce
+## 重现步骤
 
-1. <first human prompt, scrubbed>
-2. <the turns leading to the problem, one line each>
-3. <the observable>
+1. <第一个人类提示，已脱敏>
+2. <导致问题的轮次，每行一个>
+3. <可观察结果>
 
-## Expected behavior
+## 期望行为
 
-<from the problem statement>
+<来自问题陈述>
 
-## Actual behavior
+## 实际行为
 
-<from the triage verdict>
+<来自 triage 裁决>
 
-## Debug log or conversation transcript
+## 调试日志或对话转录
 
-Session id(s): <ids>. Delivered local archive: <path, redaction level <level>
-| none built>. Attached bundle: <no claim; attach only after approval>.
-Superpowers involvement per the diagnosis report: <possible | likely>, with
-evidence at <transcript lines>. This report does not propose a fix.
+会话 id：<ids>。已交付的本地存档：<path，脱敏级别 <level> | 未构建>。附加的捆绑包：<无声明；仅在批准后附加>。诊断报告中 superpowers 的参与度：<可能/很可能>，证据在 <transcript lines>。此报告不提出修复建议。
 
 ---
-Filed with the `diagnosing-superpowers` skill. The filing model and
-harness are under "Who's filing"; the diagnosed session's model, harness,
-versions, and plugins are in the Environment table.
+使用 `diagnosing-superpowers` 技能提交。提交模型和工具在"谁在提交"下；被诊断会话的模型、工具、版本和插件在环境表中。
