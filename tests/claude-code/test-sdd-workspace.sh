@@ -362,6 +362,62 @@ PLAN
         echo "    marker: $(cat "$dir_out/plan-path" 2>/dev/null)"
     fi
 
+    # --- Phase-scoped and Chinese-labeled task headings (phase-scoped ids) ---
+    cat > "$repo/plan-phases.md" <<'PLAN'
+# Phased Plan
+
+## 阶段 C1：基础
+
+### 任务 C1-1：第一步
+
+第一阶段的正文。
+
+### 任务 C1-2：第二步
+
+第二阶段的第一步正文。
+
+## 阶段 C2：进阶
+
+### 任务 C2-2：第三步
+
+第二阶段的正文。
+PLAN
+
+    local brief_c11 brief_c22 brief_amb_rc=0 brief_amb_out brief_cn
+    brief_c11="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-phases.md C1-1 "$TEST_ROOT/brief-c11.md" >/dev/null; cat "$TEST_ROOT/brief-c11.md")"
+    if [[ "$brief_c11" == *"第一阶段的正文"* && "$brief_c11" != *"第二阶段的第一步正文"* ]]; then
+        pass "task-brief resolves a phase-scoped id (C1-1)"
+    else
+        fail "task-brief resolves a phase-scoped id (C1-1)"
+        echo "    brief: $brief_c11"
+    fi
+
+    brief_c22="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-phases.md C2-2 "$TEST_ROOT/brief-c22.md" >/dev/null; cat "$TEST_ROOT/brief-c22.md")"
+    if [[ "$brief_c22" == *"第二阶段的正文"* ]]; then
+        pass "task-brief resolves a phase-scoped id in a later phase (C2-2)"
+    else
+        fail "task-brief resolves a phase-scoped id in a later phase (C2-2)"
+        echo "    brief: $brief_c22"
+    fi
+
+    brief_amb_out="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-phases.md 2 "$TEST_ROOT/brief-amb.md" 2>&1)" || brief_amb_rc=$?
+    if [[ "$brief_amb_rc" -eq 3 && "$brief_amb_out" == *"ambiguous"* ]]; then
+        pass "a trailing number matching two phases is an error, not a guess"
+    else
+        fail "a trailing number matching two phases is an error, not a guess"
+        echo "    rc: $brief_amb_rc"
+        echo "    output: $brief_amb_out"
+    fi
+
+    printf '# 中文计划\n\n### 任务 3：中文标题\n\n中文正文。\n' > "$repo/plan-cn.md"
+    brief_cn="$(cd "$repo" && "$SDD_SCRIPTS/task-brief" plan-cn.md 3 "$TEST_ROOT/brief-cn.md" >/dev/null; cat "$TEST_ROOT/brief-cn.md")"
+    if [[ "$brief_cn" == *"中文正文"* ]]; then
+        pass "task-brief resolves a Chinese-labeled task heading (任务 3：)"
+    else
+        fail "task-brief resolves a Chinese-labeled task heading (任务 3：)"
+        echo "    brief: $brief_cn"
+    fi
+
     # --- A repo's own committed .superpowers/sdd/.gitignore is left alone ---
     git init -q -b main "$TEST_ROOT/own-ignore"
     local own own_ignore
