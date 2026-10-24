@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# zip records entry timestamps in local time; the 1980-01-01 normalization
+# assertion below only holds under UTC.
+export TZ=UTC
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SCRIPT_UNDER_TEST="$REPO_ROOT/scripts/package-codex-plugin.sh"

@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 # Helper functions for Claude Code skill tests
 
+# The assertions below are Chinese, so they need a UTF-8 locale. Under a C
+# locale GNU grep treats a bracket expression containing multi-byte characters
+# (e.g. "[：:]") as a set of individual bytes, so those patterns silently never
+# match. Promote the environment to UTF-8 when it is not already.
+if ! locale charmap 2>/dev/null | grep -qi 'utf-\?8'; then
+    for candidate in C.UTF-8 C.utf8 en_US.UTF-8; do
+        if locale -a 2>/dev/null | grep -qix "$candidate"; then
+            export LC_ALL="$candidate"
+            break
+        fi
+    done
+fi
+
 # Run Claude Code with a prompt and capture output
 # Usage: run_claude "prompt text" [timeout_seconds] [allowed_tools]
 run_claude() {
