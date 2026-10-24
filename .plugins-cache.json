@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "marketplaceName": "superpowers-dev",
+  "manifestMtime": 1792803702527.8186,
+  "createdAt": 1792809314272,
+  "plugins": [
+    {
+      "name": "superpowers",
+      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
+      "version": "7.0.1",
+      "source": "./",
+      "author": {
+        "name": "Jesse Vincent",
+        "email": "jesse@fsck.com"
+      },
+      "marketplaceName": "superpowers-dev",
+      "installedPath": "/home/frf/superpowers/",
+      "_capabilitiesLoaded": true,
+      "homepage": "https://github.com/obra/superpowers",
+      "repository": "https://github.com/obra/superpowers",
+      "license": "MIT",
+      "keywords": [
+        "skills",
+        "tdd",
+        "debugging",
+        "collaboration",
+        "best-practices",
+        "workflows"
+      ],
+      "sourcePath": "./",
+      "configPath": "/home/frf/superpowers/.claude-plugin/plugin.json",
+      "hooks": {
+        "SessionStart": [
+          {
+            "matcher": "startup|clear|compact",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "\"/home/frf/superpowers//hooks/run-hook.cmd\" session-start",
+                "shell": "bash",
+                "async": false,
+                "pluginRoot": "/home/frf/superpowers/"
+              }
+            ]
+          }
+        ]
+      },
+      "skills": [
+        {
+          "name": "brainstorming",
+          "description": "在任何创造性工作之前必须使用本技能——创建功能、构建组件、增加功能或修改行为，或在软件之外规划任何新事物（一场演讲、一项业务、一次翻新）。",
+          "path": "skills/brainstorming"
+        },
+        {
+          "name": "diagnosing-superpowers",
+          "description": "当 superpowers 会话出错且你的人类伙伴想知道为什么时使用 — 重复工作、忽略计划、挫折、糟糕结果、技能未触发、\"耗时太长\"、\"为什么这么贵\"、\"它在做什么\" — 或想为 superpowers 维护者构建 bug 报告，用于当前会话或通过 id 或路径识别的过去会话，在任何工具上。",
+          "path": "skills/diagnosing-superpowers"
+        },
+        {
+          "name": "dispatching-parallel-agents",
+          "description": "当面对 2 个以上相互独立、可在无共享状态或顺序依赖的情况下处理的任务时使用",
+          "path": "skills/dispatching-parallel-agents"
+        },
+        {
+          "name": "executing-plans",
+          "description": "当在当前会话中作为实施者自己执行实施计划时使用——你的（人类）搭档选择了内联执行，或没有可用的子代理工具",
+          "path": "skills/executing-plans"
+        },
+        {
+          "name": "finishing-a-development-branch",
+          "description": "当实施完成、所有测试通过，且你需要决定如何集成工作时使用",
+          "path": "skills/finishing-a-development-branch"
+        },
+        {
+          "name": "receiving-code-review",
+          "description": "当收到代码审查反馈时使用，在实施建议之前，特别是当反馈看起来不清楚或在技术上有疑问时——需要技术严谨性和验证，而不是表演式同意或盲目实施",
+          "path": "skills/receiving-code-review"
+        },
+        {
+          "name": "requesting-code-review",
+          "description": "当完成任务、实施主要功能或在合并之前验证工作是否符合要求时使用",
+          "path": "skills/requesting-code-review"
+        },
+        {
+          "name": "subagent-driven-development",
+          "description": "当在当前会话中执行包含相互独立任务的实施计划时使用",
+          "path": "skills/subagent-driven-development"
+        },
+        {
+          "name": "systematic-debugging",
+          "description": "在遇到任何 bug、测试失败或意外行为时，在提出修复方案之前使用",
+          "path": "skills/systematic-debugging"
+        },
+        {
+          "name": "test-driven-development",
+          "description": "在实现任何特性或 bug 修复时，在编写实现代码之前使用",
+          "path": "skills/test-driven-development"
+        },
+        {
+          "name": "using-git-worktrees",
+          "description": "当开始需要与当前工作区隔离的功能工作或执行实施计划之前使用——确保通过原生工具或 git worktree 回退方案存在隔离的工作区",
+          "path": "skills/using-git-worktrees"
+        },
+        {
+          "name": "using-superpowers",
+          "description": "在开始任何对话时使用——它确立了如何查找和使用技能，要求在任何回应之前（包括澄清性问题）调用技能",
+          "path": "skills/using-superpowers"
+        },
+        {
+          "name": "verification-before-completion",
+          "description": "当即将声称工作完成、已修复或通过时，在提交或创建 PR 之前使用——需要运行验证命令并确认输出，然后才能做出任何成功声明；证据永远在断言之前",
+          "path": "skills/verification-before-completion"
+        },
+        {
+          "name": "writing-plans",
+          "description": "当你有规格说明或多步骤任务的要求时，在接触代码之前使用",
+          "path": "skills/writing-plans"
+        },
+        {
+          "name": "writing-skills",
+          "description": "当创建新技能、编辑既有技能或在部署之前验证技能可用时使用",
+          "path": "skills/writing-skills"
+        }
+      ]
+    }
+  ]
+}

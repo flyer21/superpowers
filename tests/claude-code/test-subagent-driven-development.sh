@@ -28,7 +28,7 @@ else
     exit 1
 fi
 
-if assert_contains "$output" "Load Plan\|read.*plan\|extract.*tasks" "Mentions loading plan"; then
+if assert_contains "$output" "Load Plan\|read.*plan\|extract.*tasks\|通读计划\|读取计划" "Mentions loading plan"; then
     : # pass
 else
     exit 1
@@ -36,14 +36,20 @@ fi
 
 echo ""
 
-# Test 2: Verify skill describes correct workflow order
-echo "Test 2: Workflow ordering..."
+# Test 2: Verify whole-branch self-review covers both spec and quality
+echo "Test 2: Whole-branch self-review scope..."
 
-output=$(run_claude "In the subagent-driven-development skill, what comes first: spec compliance review or code quality review? Answer using exactly this structure:
-First: <review type>
-Second: <review type>" "$CLAUDE_PROMPT_TIMEOUT")
+output=$(run_claude "In the subagent-driven-development skill, does the whole-branch self-review cover both spec compliance and code quality? Answer using exactly this structure:
+Covers spec compliance: <yes or no>
+Covers code quality: <yes or no>" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_order "$output" "First:.*spec.*compliance" "Second:.*code.*quality" "Spec compliance before code quality"; then
+if assert_contains "$output" "Covers spec compliance:.*yes" "Covers spec compliance"; then
+    : # pass
+else
+    exit 1
+fi
+
+if assert_contains "$output" "Covers code quality:.*yes" "Covers code quality"; then
     : # pass
 else
     exit 1
@@ -51,20 +57,20 @@ fi
 
 echo ""
 
-# Test 3: Verify self-review is mentioned
-echo "Test 3: Self-review requirement..."
+# Test 3: Verify implementers do NOT self-review (whole-branch self-review model)
+echo "Test 3: No implementer self-review..."
 
-output=$(run_claude "Does the subagent-driven-development skill require implementers to self-review before handoff, and can self-review replace the external reviews? Answer using exactly this structure:
-Self-review required: <yes or no>
-Self-review replaces external review: <yes or no>" "$CLAUDE_PROMPT_TIMEOUT")
+output=$(run_claude "In the subagent-driven-development skill, do implementers self-review before handoff? Answer using exactly this structure:
+Implementer self-review required: <yes or no>
+Whole-branch self-review by controller: <yes or no>" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_contains "$output" "Self-review required:.*yes" "Mentions self-review"; then
+if assert_contains "$output" "Implementer self-review required:.*no" "Implementers do not self-review"; then
     : # pass
 else
     exit 1
 fi
 
-if assert_contains "$output" "Self-review replaces external review:.*no" "Self-review does not replace external review"; then
+if assert_contains "$output" "Whole-branch self-review by controller:.*yes" "Controller does whole-branch self-review"; then
     : # pass
 else
     exit 1
@@ -91,18 +97,18 @@ fi
 
 echo ""
 
-# Test 5: Verify spec compliance reviewer is skeptical
-echo "Test 5: Spec compliance reviewer mindset..."
+# Test 5: Verify controller self-review is skeptical
+echo "Test 5: Controller self-review mindset..."
 
-output=$(run_claude "What is the spec compliance reviewer's attitude toward the implementer's report in subagent-driven-development?" "$CLAUDE_PROMPT_TIMEOUT")
+output=$(run_claude "In subagent-driven-development, what is the controller's attitude when doing the whole-branch self-review? Should they trust the implementer's report?" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_contains "$output" "not.*trust\|don't trust\|skeptical\|verify.*independently\|suspiciously" "Reviewer is skeptical"; then
+if assert_contains "$output" "not.*trust\|don't trust\|skeptical\|verify.*independently\|suspiciously\|不.*信任\|独立核实\|怀疑" "Controller is skeptical"; then
     : # pass
 else
     exit 1
 fi
 
-if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code\|read.*diff\|trust.*diff" "Reviewer reads code"; then
+if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code\|read.*diff\|trust.*diff\|读.*diff\|读.*代码\|核实" "Controller reads code"; then
     : # pass
 else
     exit 1
@@ -110,18 +116,18 @@ fi
 
 echo ""
 
-# Test 6: Verify review loops
-echo "Test 6: Review loop requirements..."
+# Test 6: Verify fix wave after self-review
+echo "Test 6: Fix wave after self-review..."
 
-output=$(run_claude "In subagent-driven-development, what happens if a reviewer finds issues? Is it a one-time review or a loop?" "$CLAUDE_PROMPT_TIMEOUT")
+output=$(run_claude "In subagent-driven-development, what happens if the whole-branch self-review finds issues? Is there a fix process?" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_contains "$output" "loop\|again\|repeat\|until.*approved\|until.*compliant" "Review loops mentioned"; then
+if assert_contains "$output" "fix.*wave\|修复波\|one.*fixer\|一个.*修复\|single.*subagent" "Fix wave with single fixer"; then
     : # pass
 else
     exit 1
 fi
 
-if assert_contains "$output" "implementer.*fix\|fix.*issues" "Implementer fixes issues"; then
+if assert_contains "$output" "three.*round\|三轮\|breaker\|熔断\|circuit" "Fix wave has limits"; then
     : # pass
 else
     exit 1
