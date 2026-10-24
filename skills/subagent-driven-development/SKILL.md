@@ -166,19 +166,9 @@ digraph process {
 
 任务清单全部执行完成之前，不进行任何审查——任务之间不派审查者，任务内部也不做自审：实现者提交后直接汇报，你把完成行记入账本就进入下一个任务。中途审查会打断执行、烧掉协调上下文，而且尚未落定的代码会让结论很快过时。一切发现问题的工作都集中到最后这一次：当最后一个任务记录完成、不再有剩余任务时，由你本人对整条分支做整体自审。
 
-整分支自审由你本人执行——你是协调者、没有亲手写任何任务的代码，这份 diff 对你就是一份待审视的交付物。它取代外派审查者：不再为整条分支派遣任何审查子代理，也就没有第二双眼睛的成本与延迟。自审的对象是整条分支，规格符合性与代码质量各过一遍；你在其中发现的全部问题进入修复波。清单见 [task-reviewer-prompt.md](task-reviewer-prompt.md)。
+整分支自审由你本人执行——你是协调者、没有亲手写任何任务的代码，这份 diff 对你就是一份待审视的交付物。它取代外派审查者：不再为整条分支派遣任何审查子代理，也就没有第二双眼睛的成本与延迟。自审的对象是整条分支，规格符合性与代码质量各过一遍；你在其中发现的全部问题进入修复波。
 
-- **生成本分支的 diff 并亲自通读：** 从本技能目录运行 `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支起始的提交，例如 `git merge-base main HEAD`）——它把提交列表、stat 摘要和带上下文的完整 diff 写进一个唯一命名的文件（没有 bash 时：把 `git log --oneline`、`git diff --stat` 和分支范围的 `git diff -U10` 重定向到一个唯一命名的文件）。然后亲自 Read 这份 diff——连同计划文件（或规格）与账本——对照计划逐项核实全部任务的功能与质量。
-- **逐项对照：** 每个任务一行：账本里的提交范围（`<base7>..<head7>`）和测试摘要在手，按任务简报逐项核实它交付了什么、有没有缺失或越界。跨任务交互只在整条分支上浮现——这正是只在收尾自审一次而非逐任务审查的价值所在。
-- **分级与去向：** Critical / Important / 规格 ❌ 进修复波；Minor 记入账本延后（`Review: minor (deferred): <one-liner>`）。发现与计划文本冲突时，把发现与计划放到天平上、以规格为绑定权威做出裁决并先记入账本。
-- **对抗自审的偏差：** 你既是协调者又是审查者——这是把双刃剑。某条发现冒出来时，不要因为它"符合你派遣时的设想"或"实现者已经跑过测试"就顺手放掉：被你自己合理化掉的问题永远回不来。如果一条发现让你想写"计划选择了"或"实现者解释过"——停下来：你在替实现者给自己判作业。
-- **大分支分遍自审：** 如果整条分支大到一次装不下，按文件或组件分批自审，每一批的发现当场记入账本（`Review: <finding> (<severity>) — <file:line> — <why it matters>`）。账本就是跨批与跨压缩的记忆。
-- 不要为了自审重跑实现者已经在同一份代码上跑过的全套测试——账本为每个任务记录了提交范围与测试摘要。只有当阅读某段代码引发了某个现存结果无法回答的具体疑虑时，才跑一次聚焦测试，并把命令与结果记入账本。
-- 发现落在横跨多个任务交互的需求上、仅凭 diff 无法完全核实时，由你亲自解决——计划与跨任务上下文在你手里。如果你无法从 diff 或计划确认一项需求确实被满足，把它当作真实缺口对待，和其他发现一起进入修复波（见 [references/cannot-verify.md](references/cannot-verify.md)）。
-
-修复波被触发时，阅读 [references/fix-loop.md](references/fix-loop.md) 并遵循它。在每轮之前重新阅读它，即使你在此会话的早期阅读过它：它持有轮次上限、断路器和每轮写入的账本行，你对它的记忆无法在压缩后幸存。修复后的复检用 [re-review-prompt.md](re-review-prompt.md)。
-
-**自审干净之后（无论是否走过修复波）：** 阅读 [references/final-review.md](references/final-review.md) 完成收尾——收集全部 `Ruling:` 行交给你的（人类）搭档、删除本计划的工作区、转入 `superpowers:finishing-a-development-branch`。
+怎么做、怎么分级、怎么在大分支上分批、怎么收尾，见 [references/final-review.md](references/final-review.md)；逐项对照的清单见 [task-reviewer-prompt.md](task-reviewer-prompt.md)。修复波被触发时阅读 [references/fix-loop.md](references/fix-loop.md)，修复后的复检用 [re-review-prompt.md](re-review-prompt.md)。
 
 ## 常见合理化
 

@@ -1,14 +1,32 @@
 # 整分支自审与完成
 
-属于 superpowers:subagent-driven-development。计划中的每个任务都已完成。
+属于 superpowers:subagent-driven-development。计划中的每个任务都已完成，这是收尾时唯一一次发现问题的工作。
 
-整分支自审由你本人执行，不派遣审查子代理：用 `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支开始的提交，例如 `git merge-base main HEAD`）生成整条分支的 diff 包，亲自通读它，连同计划文件（或规格）与账本对照。逐项核实的清单见 [task-reviewer-prompt.md](../task-reviewer-prompt.md)。
+## 怎么自审
 
-你发现的问题按严重级别分诊：Critical / Important / 规格 ❌ 进修复波；Minor 记入账本延后（`Review: minor (deferred): <one-liner>`）。
+整分支自审由你本人执行，不派遣审查子代理。你是协调者、没有亲手写任何任务的代码，这份 diff 对你就是一份待审视的交付物。
 
-如果自审发现了问题，派遣**一个**修复子代理携带完整的问题清单——不是每个问题一个修复者。每个问题的修复者各自重建上下文并重新运行套件；真实会话里那样做的成本超过其所有任务的总和。修复完成后做一次限定范围的复检（`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` 覆盖修复范围，[re-review-prompt.md](../re-review-prompt.md)）。裁决任何剩余问题如同修复波的断路器（references/fix-loop.md）：用裁决停放，或对负载关键的问题裁决并记入账本你决定的内容。只有停止运行计划的东西（SKILL.md 顶部）在这里停止你。
+**生成 diff 并亲自通读：** 从本技能目录运行 `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD`（MERGE_BASE = 分支起始的提交，例如 `git merge-base main HEAD`）——它把提交列表、stat 摘要和带上下文的完整 diff 写进一个唯一命名的文件（没有 bash 时：把 `git log --oneline`、`git diff --stat` 和分支范围的 `git diff -U10` 重定向到一个唯一命名的文件）。然后亲自 Read 这份 diff，连同计划文件（或规格）与账本。
 
-### 完成
+**逐项对照：** 每个任务一行：账本里的提交范围（`<base7>..<head7>`）和测试摘要在手，按任务简报逐项核实它交付了什么、有没有缺失或越界（多余的"锦上添花"、被计划漏掉的相互作用）。跨任务交互只在整条分支上浮现——这正是只在收尾自审一次而非逐任务审查的价值所在。清单见 [task-reviewer-prompt.md](../task-reviewer-prompt.md)。
+
+**分级与去向：** Critical / Important / 规格 ❌ 进修复波；Minor 记入账本延后（`Review: minor (deferred): <one-liner>`）。发现与计划文本冲突时，把发现与计划放到天平上、以规格为绑定权威做出裁决并先记入账本。
+
+**对抗自审的偏差：** 你既是协调者又是审查者。某条发现冒出来时，不要因为它"符合你派遣时的设想"或"实现者已经跑过测试"就顺手放掉。如果一条发现让你想写"计划选择了"或"实现者解释过"——停下来：你在替实现者给自己判作业。
+
+**大分支分遍自审：** 如果整条分支大到一次装不下，按文件或组件分批自审，每一批的发现当场记入账本（`Review: <finding> (<severity>) — <file:line> — <why it matters>`）。账本就是跨批与跨压缩的记忆。
+
+**不要重跑全套测试：** 账本为每个任务记录了提交范围与测试摘要。只有当阅读某段代码引发了某个现存结果无法回答的具体疑虑时，才跑一次聚焦测试，并把命令与结果记入账本。
+
+**无法核实的需求：** 落在横跨多个任务交互上、仅凭 diff 无法完全核实的需求，由你亲自解决。无法从 diff 或计划确认一项需求确实被满足时，把它当作真实缺口对待，进修复波（见 [cannot-verify.md](cannot-verify.md)）。
+
+## 修复波
+
+如果自审发现了问题，派遣**一个**修复子代理携带完整的问题清单——不是每个问题一个修复者。每个问题的修复者各自重建上下文并重新运行套件；真实会话里那样做的成本超过其所有任务的总和。
+
+修复完成后做一次限定范围的复检（`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` 覆盖修复范围，[re-review-prompt.md](../re-review-prompt.md)）。裁决任何剩余问题如同修复波的断路器（[fix-loop.md](fix-loop.md)）：用裁决停放，或对负载关键的问题裁决并记入账本你决定的内容。只有停止运行计划的东西（SKILL.md 顶部）在这里停止你。
+
+## 完成
 
 在删除任何东西之前，收集每个包含 `Ruling:` 的账本行——预飞行裁决、停放发现、断路器裁决，所有——在你的最终消息下"我做的裁决"，按你做的顺序，每个带有如果错误的成本。列表是详尽的：如果账本持有裁决，列表持有它。该列表是你代表你的（人类）搭档做的决定到达他们的唯一地方——他们阅读它并重新做你做的任何错误的东西。与工作区一起死去的裁决是秘密做的决定。
 
