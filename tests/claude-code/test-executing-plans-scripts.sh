@@ -89,7 +89,7 @@ PLAN
     out="$(cd "$repo" && "$EP_SCRIPTS/task-done" plan.md 1 "$base" -- sh -c 'echo "Ran 3 tests"; echo OK')"
     rc=$?
     local ledger="$repo/.superpowers/sdd/plan/progress.md"
-    local expected="Task 1: complete (commits ${base:0:7}..${head:0:7}, tests: sh -c 'echo \"Ran 3 tests\"; echo OK' → OK)"
+    local expected="任务 1: 完成 (提交 ${base:0:7}..${head:0:7}, 测试: sh -c 'echo \"Ran 3 tests\"; echo OK' → OK)"
     if [[ -f "$ledger" ]] && grep -qF "$expected" "$ledger"; then
         pass "task-done appends the completion line with commit range and test result"
     else
@@ -117,7 +117,7 @@ PLAN
     else
         fail "task-done exits non-zero when the test command fails"
     fi
-    if ! grep -q "Task 2: complete" "$ledger"; then
+    if ! grep -q "任务 2: 完成" "$ledger"; then
         pass "task-done does not record a failing task as complete"
     else
         fail "task-done does not record a failing task as complete"
@@ -145,7 +145,7 @@ PLAN
         fail "task-done exits 0 when a passing test command prints nothing (got rc=$rc)"
         echo "    got: $out"
     fi
-    local expected2="Task 2: complete (commits ${head:0:7}..${head2:0:7}, tests: true → (no output))"
+    local expected2="任务 2: 完成 (提交 ${head:0:7}..${head2:0:7}, 测试: true → (no output))"
     if [[ -f "$ledger" ]] && grep -qF "$expected2" "$ledger"; then
         pass "task-done records a passing task that printed no output"
     else

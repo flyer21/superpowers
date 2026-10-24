@@ -41,12 +41,12 @@ rc=0
 
 tail -n 5 "$log"
 if [ "$rc" -ne 0 ]; then
-  echo "task-done: test command exited $rc; Task $n NOT recorded (full output: $log)" >&2
+  echo "task-done: 测试命令退出码 $rc；任务 $n 未记录（完整输出：$log）" >&2
   exit "$rc"
 fi
 
 last=$(grep -v '^[[:space:]]*$' "$log" | tail -n 1) || last="(no output)"
 [ -f "$ledger" ] || printf '# SDD ledger — plan: %s\n' "$plan" > "$ledger"
-line="Task $n: complete (commits $(git rev-parse --short=7 "$base")..$(git rev-parse --short=7 HEAD), tests: $cmd → $last)"
+line="任务 $n: 完成 (提交 $(git rev-parse --short=7 "$base")..$(git rev-parse --short=7 HEAD), 测试: $cmd → $last)"
 printf '%s\n' "$line" >> "$ledger"
 echo "ledger: $line"
