@@ -28,8 +28,19 @@
 
 ## 完成
 
+**归档：** 在删除工作区之前，将每个任务的简报和账本归档到 per-plan 目录：
+```bash
+ARCHIVE_DIR="$HOME/.superpowers/archives/$(basename "$plan" .md)"
+mkdir -p "$ARCHIVE_DIR"
+cp "$dir/progress.md" "$ARCHIVE_DIR/ledger.md"
+for brief in "$dir"/task-*-brief.md; do
+  [ -f "$brief" ] && cp "$brief" "$ARCHIVE_DIR/"
+done
+```
+归档目录按计划文件命名（去掉 `.md` 后缀），包含 `ledger.md` 和所有 `task-<ID>-brief.md` 文件。这确保工作区删除后仍可追溯每个任务的完整上下文。
+
 在删除任何东西之前，收集每个包含 `裁决:` 的账本行——预飞行裁决、停放发现、断路器裁决，所有——在你的最终消息下"我做的裁决"，按你做的顺序，每个带有如果错误的成本。列表是详尽的：如果账本持有裁决，列表持有它。该列表是你代表你的（人类）搭档做的决定到达他们的唯一地方——他们阅读它并重新做你做的任何错误的东西。与工作区一起死去的裁决是秘密做的决定。
 
 当整分支自审干净且其修复已合并，删除此计划的工作区（`rm -rf <workspace>`）——git 历史现在是记录。同级目录属于其他计划；不要动它们。
 
-使用 superpowers:finishing-a-development-branch。
+使用 superpowers:finishing-a-development-branch。如果计划头部包含路线图字段，在调用 finishing 时带上"（路线图 <路径>，阶段 N：<名称>）"作为上下文，finishing 将据此检测是否还有后续阶段。
